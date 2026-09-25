@@ -1,0 +1,2844 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dashboard | Campus Lost & Found</title>
+
+    <link
+        rel="stylesheet"
+        href="./css/styles.css"
+    >
+
+    <style>
+
+        :root {
+
+            --green: #004d2f;
+            --green-dark: #003b24;
+            --gold: #d4af37;
+            --red: #a6192e;
+
+            --cream: #f5f1e8;
+            --white: #ffffff;
+
+            --text: #17201c;
+            --muted: #737a76;
+
+            --border: #e7e9e5;
+
+            --sidebar: 245px;
+
+        }
+
+
+        * {
+
+            box-sizing: border-box;
+
+        }
+
+
+        body,
+        button,
+        input,
+        a {
+
+            font-family:
+                "Times New Roman",
+                Times,
+                serif;
+
+        }
+
+
+        body {
+
+            margin: 0;
+
+            background: #f6f7f4;
+
+            color: var(--text);
+
+        }
+
+
+        button,
+        input {
+
+            font-size: inherit;
+
+        }
+
+
+        a {
+
+            text-decoration: none;
+
+        }
+
+
+        /* =====================================
+           APPLICATION
+        ===================================== */
+
+        .app {
+
+            min-height: 100vh;
+
+            display: flex;
+
+        }
+
+
+        /* =====================================
+           SIDEBAR
+        ===================================== */
+
+        .sidebar {
+
+            position: fixed;
+
+            left: 0;
+            top: 0;
+            bottom: 0;
+
+            width: var(--sidebar);
+
+            background: var(--green);
+
+            color: white;
+
+            display: flex;
+
+            flex-direction: column;
+
+            z-index: 100;
+
+        }
+
+
+        .sidebar-brand {
+
+            height: 88px;
+
+            padding: 16px 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.12);
+
+        }
+
+
+        .sidebar-brand img {
+
+            width: 42px;
+
+            height: 54px;
+
+            object-fit: contain;
+
+        }
+
+
+        .sidebar-brand h2 {
+
+            margin: 0;
+
+            font-size: 14px;
+
+            line-height: 1.3;
+
+        }
+
+
+        .sidebar-brand p {
+
+            margin: 4px 0 0;
+
+            font-size: 10px;
+
+            color:
+                rgba(255,255,255,.65);
+
+            letter-spacing: .7px;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .nav-title {
+
+            padding:
+                24px
+                22px
+                9px;
+
+            font-size: 10px;
+
+            font-weight: bold;
+
+            letter-spacing: 1.5px;
+
+            color:
+                rgba(255,255,255,.45);
+
+        }
+
+
+        .sidebar-nav {
+
+            padding: 0 12px;
+
+        }
+
+
+        .nav-link {
+
+            height: 44px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            padding: 0 13px;
+
+            color:
+                rgba(255,255,255,.78);
+
+            font-size: 14px;
+
+            border-radius: 6px;
+
+            transition:
+                background .15s,
+                color .15s;
+
+        }
+
+
+        .nav-link:hover {
+
+            background:
+                rgba(255,255,255,.08);
+
+            color: white;
+
+        }
+
+
+        .nav-link.active {
+
+            background:
+                rgba(255,255,255,.13);
+
+            color: white;
+
+            border-left:
+                3px solid
+                var(--gold);
+
+            padding-left: 10px;
+
+        }
+
+
+        .nav-icon {
+
+            width: 19px;
+
+            text-align: center;
+
+            font-size: 17px;
+
+        }
+
+
+        .sidebar-bottom {
+
+            margin-top: auto;
+
+            padding: 14px 12px;
+
+            border-top:
+                1px solid
+                rgba(255,255,255,.12);
+
+        }
+
+
+        .logout {
+
+            color:
+                rgba(255,255,255,.75);
+
+        }
+
+
+        .logout:hover {
+
+            color: white;
+
+            background:
+                rgba(166,25,46,.35);
+
+        }
+
+
+        /* =====================================
+           MAIN
+        ===================================== */
+
+        .main {
+
+            width:
+                calc(100% - var(--sidebar));
+
+            margin-left:
+                var(--sidebar);
+
+            min-height: 100vh;
+
+        }
+
+
+        /* =====================================
+           TOP BAR
+        ===================================== */
+
+        .topbar {
+
+            height: 72px;
+
+            background: white;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 35px;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 50;
+
+        }
+
+
+        .page-title h1 {
+
+            margin: 0;
+
+            font-size: 21px;
+
+        }
+
+
+        .page-title p {
+
+            margin: 4px 0 0;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        .topbar-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 20px;
+
+        }
+
+
+        .notification-button {
+
+            position: relative;
+
+            width: 38px;
+
+            height: 38px;
+
+            border:
+                1px solid
+                var(--border);
+
+            background: white;
+
+            border-radius: 50%;
+
+            cursor: pointer;
+
+            font-size: 17px;
+
+        }
+
+
+        .notification-badge {
+
+            position: absolute;
+
+            right: -1px;
+
+            top: -1px;
+
+            width: 16px;
+
+            height: 16px;
+
+            border-radius: 50%;
+
+            background: var(--red);
+
+            color: white;
+
+            font-size: 9px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+        }
+
+
+        .user-mini {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+        }
+
+
+        .avatar {
+
+            width: 37px;
+
+            height: 37px;
+
+            border-radius: 50%;
+
+            background: var(--green);
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+        }
+
+
+        .user-mini-text strong {
+
+            display: block;
+
+            font-size: 13px;
+
+        }
+
+
+        .user-mini-text span {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+        }
+
+
+        /* =====================================
+           CONTENT
+        ===================================== */
+
+        .content {
+
+            padding:
+                30px
+                35px
+                45px;
+
+            max-width: 1500px;
+
+        }
+
+
+        /* =====================================
+           WELCOME
+        ===================================== */
+
+        .welcome {
+
+            background: var(--green);
+
+            min-height: 155px;
+
+            padding: 28px 32px;
+
+            color: white;
+
+            position: relative;
+
+            overflow: hidden;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            border-radius: 7px;
+
+        }
+
+
+        .welcome::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 250px;
+
+            height: 250px;
+
+            right: -80px;
+
+            top: -100px;
+
+            border:
+                45px solid
+                rgba(212,175,55,.13);
+
+            border-radius: 50%;
+
+        }
+
+
+        .welcome-label {
+
+            color: var(--gold);
+
+            font-size: 10px;
+
+            letter-spacing: 2px;
+
+            font-weight: bold;
+
+        }
+
+
+        .welcome h2 {
+
+            margin:
+                8px 0
+                7px;
+
+            font-size: 30px;
+
+        }
+
+
+        .welcome p {
+
+            margin: 0;
+
+            color:
+                rgba(255,255,255,.72);
+
+            font-size: 13px;
+
+        }
+
+
+        .welcome-date {
+
+            position: relative;
+
+            z-index: 2;
+
+            padding:
+                12px
+                16px;
+
+            background:
+                rgba(255,255,255,.08);
+
+            border:
+                1px solid
+                rgba(255,255,255,.12);
+
+            font-size: 12px;
+
+        }
+
+
+        /* =====================================
+           SECTION
+        ===================================== */
+
+        .section {
+
+            margin-top: 28px;
+
+        }
+
+
+        .section-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 13px;
+
+        }
+
+
+        .section-header h3 {
+
+            margin: 0;
+
+            font-size: 17px;
+
+        }
+
+
+        .section-header span {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+        }
+
+
+        /* =====================================
+           STATISTICS
+        ===================================== */
+
+        .stats {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+
+        }
+
+
+        .stat-card {
+
+            background: white;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 6px;
+
+            padding: 18px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            min-height: 105px;
+
+        }
+
+
+        .stat-info p {
+
+            margin: 0;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .7px;
+
+        }
+
+
+        .stat-info h3 {
+
+            margin:
+                7px 0
+                0;
+
+            font-size: 30px;
+
+        }
+
+
+        .stat-icon {
+
+            width: 43px;
+
+            height: 43px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 7px;
+
+            font-size: 19px;
+
+        }
+
+
+        .stat-green {
+
+            background: #e8f3ed;
+
+            color: var(--green);
+
+        }
+
+
+        .stat-gold {
+
+            background: #f8f1d9;
+
+            color: #927718;
+
+        }
+
+
+        .stat-red {
+
+            background: #f8e8eb;
+
+            color: var(--red);
+
+        }
+
+
+        .stat-black {
+
+            background: #eceeed;
+
+            color: #333;
+
+        }
+
+
+        /* =====================================
+           QUICK ACTIONS
+        ===================================== */
+
+        .quick-actions {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 15px;
+
+        }
+
+
+        .action {
+
+            background: white;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 6px;
+
+            padding: 18px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            cursor: pointer;
+
+            transition:
+                transform .15s,
+                box-shadow .15s;
+
+        }
+
+
+        .action:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 8px 25px
+                rgba(0,0,0,.07);
+
+        }
+
+
+        .action-icon {
+
+            width: 42px;
+
+            height: 42px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 21px;
+
+            border-radius: 6px;
+
+        }
+
+
+        .action-text h4 {
+
+            margin: 0;
+
+            font-size: 14px;
+
+        }
+
+
+        .action-text p {
+
+            margin:
+                4px 0
+                0;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+        }
+
+
+        /* =====================================
+           DASHBOARD GRID
+        ===================================== */
+
+        .dashboard-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1.5fr 1fr;
+
+            gap: 15px;
+
+        }
+
+
+        .panel {
+
+            background: white;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 6px;
+
+            overflow: hidden;
+
+        }
+
+
+        .panel-header {
+
+            height: 52px;
+
+            padding:
+                0
+                18px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+        }
+
+
+        .panel-header h3 {
+
+            margin: 0;
+
+            font-size: 14px;
+
+        }
+
+
+        .panel-header a {
+
+            color: var(--green);
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+        }
+
+
+        .activity-item {
+
+            min-height: 67px;
+
+            padding:
+                12px
+                18px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            border-bottom:
+                1px solid
+                #f0f1ef;
+
+        }
+
+
+        .activity-item:last-child {
+
+            border-bottom: none;
+
+        }
+
+
+        .activity-icon {
+
+            width: 35px;
+
+            height: 35px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            font-size: 15px;
+
+        }
+
+
+        .activity-info {
+
+            flex: 1;
+
+        }
+
+
+        .activity-info strong {
+
+            display: block;
+
+            font-size: 12px;
+
+        }
+
+
+        .activity-info span {
+
+            display: block;
+
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+        }
+
+
+        .status {
+
+            padding:
+                5px
+                8px;
+
+            border-radius: 20px;
+
+            font-size: 9px;
+
+            font-weight: bold;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .status-lost {
+
+            background: #f8e8eb;
+
+            color: var(--red);
+
+        }
+
+
+        .status-found {
+
+            background: #e8f3ed;
+
+            color: var(--green);
+
+        }
+
+
+        .status-matched {
+
+            background: #f8f1d9;
+
+            color: #927718;
+
+        }
+
+
+        .status-claimed {
+
+            background: #eceeed;
+
+            color: #333;
+
+        }
+
+
+        .status-returned {
+
+            background: #e8f3ed;
+
+            color: var(--green);
+
+        }
+
+
+        .status-closed {
+
+            background: #eceeed;
+
+            color: #555;
+
+        }
+
+
+        /* =====================================
+           LOADING / EMPTY / ERROR
+        ===================================== */
+
+        .loading {
+
+            padding: 35px;
+
+            text-align: center;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        .empty {
+
+            padding: 30px;
+
+            text-align: center;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        .error-message {
+
+            margin-top: 15px;
+
+            padding: 12px;
+
+            background: #fbe9eb;
+
+            border:
+                1px solid
+                #e4b9bf;
+
+            color: var(--red);
+
+            font-size: 11px;
+
+            display: none;
+
+        }
+
+
+        /* =====================================
+           MOBILE MENU
+        ===================================== */
+
+        .mobile-menu {
+
+            display: none;
+
+        }
+
+
+        /* =====================================
+           TABLET
+        ===================================== */
+
+        @media (max-width: 1000px) {
+
+            .stats {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+
+            .dashboard-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+
+        /* =====================================
+           MOBILE
+        ===================================== */
+
+        @media (max-width: 750px) {
+
+            :root {
+
+                --sidebar: 0px;
+
+            }
+
+
+            .sidebar {
+
+                transform:
+                    translateX(-100%);
+
+                transition: .25s;
+
+                width: 245px;
+
+            }
+
+
+            .sidebar.open {
+
+                transform:
+                    translateX(0);
+
+            }
+
+
+            .main {
+
+                width: 100%;
+
+                margin-left: 0;
+
+            }
+
+
+            .topbar {
+
+                padding:
+                    0
+                    18px;
+
+            }
+
+
+            .mobile-menu {
+
+                display: block;
+
+                width: 36px;
+
+                height: 36px;
+
+                margin-right: 12px;
+
+                border:
+                    1px solid
+                    var(--border);
+
+                background: white;
+
+                cursor: pointer;
+
+            }
+
+
+            .page-title {
+
+                display: flex;
+
+                align-items: center;
+
+            }
+
+
+            .page-title p {
+
+                display: none;
+
+            }
+
+
+            .content {
+
+                padding:
+                    20px
+                    15px
+                    35px;
+
+            }
+
+
+            .welcome {
+
+                min-height: 180px;
+
+                padding: 25px;
+
+                align-items: flex-start;
+
+            }
+
+
+            .welcome-date {
+
+                display: none;
+
+            }
+
+
+            .stats {
+
+                grid-template-columns:
+                    1fr 1fr;
+
+                gap: 10px;
+
+            }
+
+
+            .stat-card {
+
+                padding: 14px;
+
+            }
+
+
+            .stat-icon {
+
+                width: 36px;
+
+                height: 36px;
+
+            }
+
+
+            .quick-actions {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .user-mini-text {
+
+                display: none;
+
+            }
+
+        }
+
+
+        @media (max-width: 450px) {
+
+            .stats {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .welcome h2 {
+
+                font-size: 25px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =================================
+         SIDEBAR
+    ================================== -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+
+        <div class="sidebar-brand">
+
+            <img
+                src="./assets/unza-crest.png"
+                alt="University of Zambia Crest"
+            >
+
+            <div>
+
+                <h2>
+                    Campus Lost &amp; Found
+                </h2>
+
+                <p>
+                    University of Zambia
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="nav-title">
+            MAIN MENU
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+
+            <a
+                href="dashboard.html"
+                class="nav-link active"
+            >
+
+                <span class="nav-icon">
+                    ⌂
+                </span>
+
+                Dashboard
+
+            </a>
+
+
+            <a
+                href="lost-item.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    ＋
+                </span>
+
+                Report Lost Item
+
+            </a>
+
+
+            <a
+                href="found-item.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    ✓
+                </span>
+
+                Report Found Item
+
+            </a>
+
+
+            <a
+                href="my-items.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    ▣
+                </span>
+
+                My Items
+
+            </a>
+
+
+            <a
+                href="matches.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    ⌕
+                </span>
+
+                Matches
+
+            </a>
+
+
+            <a
+                href="claims.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    ◇
+                </span>
+
+                My Claims
+
+            </a>
+
+
+            <a
+                href="notifications.html"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    ♢
+                </span>
+
+                Notifications
+
+            </a>
+
+
+        </nav>
+
+
+        <div class="nav-title">
+            ACCOUNT
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+
+            <a
+                href="#"
+                class="nav-link"
+            >
+
+                <span class="nav-icon">
+                    ◎
+                </span>
+
+                Profile
+
+            </a>
+
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+
+            <a
+                href="#"
+                class="nav-link logout"
+                id="logout-button"
+            >
+
+                <span class="nav-icon">
+                    ↪
+                </span>
+
+                Logout
+
+            </a>
+
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =================================
+         MAIN
+    ================================== -->
+
+    <main class="main">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+
+            <div class="page-title">
+
+
+                <button
+                    class="mobile-menu"
+                    id="mobile-menu"
+                >
+                    ☰
+                </button>
+
+
+                <div>
+
+                    <h1>
+                        Dashboard
+                    </h1>
+
+                    <p>
+                        Campus Lost &amp; Found Management System
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="topbar-right">
+
+
+                <button
+                    class="notification-button"
+                    onclick="window.location.href='notifications.html'"
+                    aria-label="Notifications"
+                >
+
+                    ♢
+
+                    <span
+                        class="notification-badge"
+                        id="notification-count"
+                    >
+                        0
+                    </span>
+
+                </button>
+
+
+                <div class="user-mini">
+
+
+                    <div
+                        class="avatar"
+                        id="user-avatar"
+                    >
+                        U
+                    </div>
+
+
+                    <div class="user-mini-text">
+
+                        <strong id="top-user-name">
+                            User
+                        </strong>
+
+                        <span id="top-user-role">
+                            Student
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =================================
+             CONTENT
+        ================================== -->
+
+        <div class="content">
+
+
+            <!-- WELCOME -->
+
+            <section class="welcome">
+
+
+                <div>
+
+
+                    <div class="welcome-label">
+                        UNIVERSITY OF ZAMBIA
+                    </div>
+
+
+                    <h2>
+
+                        Welcome,
+                        <span id="welcome-name">
+                            Student
+                        </span>
+
+                    </h2>
+
+
+                    <p>
+                        Manage your lost and found items and track
+                        their recovery from one place.
+                    </p>
+
+
+                </div>
+
+
+                <div
+                    class="welcome-date"
+                    id="current-date"
+                >
+                    Loading...
+                </div>
+
+
+            </section>
+
+
+
+            <div
+                class="error-message"
+                id="dashboard-error"
+            ></div>
+
+
+
+            <!-- =================================
+                 STATISTICS
+            ================================== -->
+
+            <section class="section">
+
+
+                <div class="section-header">
+
+                    <h3>
+                        Overview
+                    </h3>
+
+                    <span>
+                        Your account activity
+                    </span>
+
+                </div>
+
+
+                <div class="stats">
+
+
+                    <article class="stat-card">
+
+
+                        <div class="stat-info">
+
+                            <p>
+                                Lost Items
+                            </p>
+
+                            <h3 id="lost-count">
+                                —
+                            </h3>
+
+                        </div>
+
+
+                        <div class="stat-icon stat-green">
+                            ＋
+                        </div>
+
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+
+                        <div class="stat-info">
+
+                            <p>
+                                Found Items
+                            </p>
+
+                            <h3 id="found-count">
+                                —
+                            </h3>
+
+                        </div>
+
+
+                        <div class="stat-icon stat-gold">
+                            ✓
+                        </div>
+
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+
+                        <div class="stat-info">
+
+                            <p>
+                                Matches
+                            </p>
+
+                            <h3 id="match-count">
+                                —
+                            </h3>
+
+                        </div>
+
+
+                        <div class="stat-icon stat-red">
+                            ⌕
+                        </div>
+
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+
+                        <div class="stat-info">
+
+                            <p>
+                                Claims
+                            </p>
+
+                            <h3 id="claim-count">
+                                —
+                            </h3>
+
+                        </div>
+
+
+                        <div class="stat-icon stat-black">
+                            ◇
+                        </div>
+
+
+                    </article>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =================================
+                 QUICK ACTIONS
+            ================================== -->
+
+            <section class="section">
+
+
+                <div class="section-header">
+
+                    <h3>
+                        Quick Actions
+                    </h3>
+
+                    <span>
+                        Start here
+                    </span>
+
+                </div>
+
+
+                <div class="quick-actions">
+
+
+                    <a
+                        href="lost-item.html"
+                        class="action"
+                    >
+
+
+                        <div class="action-icon stat-green">
+                            ＋
+                        </div>
+
+
+                        <div class="action-text">
+
+                            <h4>
+                                Report a Lost Item
+                            </h4>
+
+                            <p>
+                                Tell us about something you've lost.
+                            </p>
+
+                        </div>
+
+
+                    </a>
+
+
+                    <a
+                        href="found-item.html"
+                        class="action"
+                    >
+
+
+                        <div class="action-icon stat-gold">
+                            ✓
+                        </div>
+
+
+                        <div class="action-text">
+
+                            <h4>
+                                Report a Found Item
+                            </h4>
+
+                            <p>
+                                Help return something found on campus.
+                            </p>
+
+                        </div>
+
+
+                    </a>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =================================
+                 RECENT ACTIVITY
+            ================================== -->
+
+            <section class="section">
+
+
+                <div class="section-header">
+
+                    <h3>
+                        Recent Activity
+                    </h3>
+
+                    <span>
+                        Latest items and updates
+                    </span>
+
+                </div>
+
+
+                <div class="dashboard-grid">
+
+
+                    <!-- RECENT ITEMS -->
+
+                    <div class="panel">
+
+
+                        <div class="panel-header">
+
+                            <h3>
+                                My Recent Items
+                            </h3>
+
+                            <a href="my-items.html">
+                                View All
+                            </a>
+
+                        </div>
+
+
+                        <div id="recent-items">
+
+                            <div class="loading">
+                                Loading your items...
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- NOTIFICATIONS -->
+
+                    <div class="panel">
+
+
+                        <div class="panel-header">
+
+                            <h3>
+                                Notifications
+                            </h3>
+
+                            <a href="notifications.html">
+                                View All
+                            </a>
+
+                        </div>
+
+
+                        <div id="recent-notifications">
+
+                            <div class="loading">
+                                Loading notifications...
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================
+   CONFIGURATION
+===================================== */
+
+const API_URL =
+    "http://localhost:5000/api";
+
+
+const token =
+    localStorage.getItem("token");
+
+
+const storedUser =
+    localStorage.getItem("user");
+
+
+
+/* =====================================
+   AUTHENTICATION CHECK
+===================================== */
+
+if (!token) {
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+
+/* =====================================
+   USER INFORMATION
+===================================== */
+
+let currentUser = null;
+
+
+try {
+
+    currentUser =
+        storedUser
+            ? JSON.parse(storedUser)
+            : null;
+
+} catch (error) {
+
+    currentUser = null;
+
+}
+
+
+if (currentUser) {
+
+
+    const name =
+        currentUser.full_name ||
+        currentUser.name ||
+        "Student";
+
+
+    const firstName =
+        name
+            .split(" ")[0];
+
+
+    document.getElementById(
+        "welcome-name"
+    ).textContent =
+        firstName;
+
+
+    document.getElementById(
+        "top-user-name"
+    ).textContent =
+        name;
+
+
+    document.getElementById(
+        "top-user-role"
+    ).textContent =
+        currentUser.role ||
+        "Student";
+
+
+    const initials =
+        name
+            .split(" ")
+            .map(word => word[0])
+            .join("")
+            .substring(0, 2)
+            .toUpperCase();
+
+
+    document.getElementById(
+        "user-avatar"
+    ).textContent =
+        initials;
+
+}
+
+
+
+/* =====================================
+   CURRENT DATE
+===================================== */
+
+document.getElementById(
+    "current-date"
+).textContent =
+
+    new Date().toLocaleDateString(
+
+        "en-ZM",
+
+        {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+
+    );
+
+
+
+/* =====================================
+   API HELPER
+===================================== */
+
+async function apiRequest(endpoint) {
+
+
+    const response =
+        await fetch(
+
+            `${API_URL}${endpoint}`,
+
+            {
+
+                headers: {
+
+                    "Authorization":
+                        `Bearer ${token}`,
+
+                    "Content-Type":
+                        "application/json"
+
+                }
+
+            }
+
+        );
+
+
+    if (response.status === 401) {
+
+
+        localStorage.removeItem(
+            "token"
+        );
+
+
+        localStorage.removeItem(
+            "user"
+        );
+
+
+        window.location.href =
+            "login.html";
+
+
+        return null;
+
+    }
+
+
+    const data =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.message ||
+            "Request failed"
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+
+/* =====================================
+   LOST ITEMS
+===================================== */
+
+async function loadLostItems() {
+
+
+    try {
+
+
+        const data =
+            await apiRequest(
+                "/lost-items"
+            );
+
+
+        if (!data) return;
+
+
+        const items =
+            data.data ||
+            data.items ||
+            [];
+
+
+        document.getElementById(
+            "lost-count"
+        ).textContent =
+            items.length;
+
+
+        renderRecentItems(
+            items,
+            "lost"
+        );
+
+
+    } catch (error) {
+
+
+        console.error(
+            "Lost items:",
+            error
+        );
+
+
+        document.getElementById(
+            "lost-count"
+        ).textContent =
+            "0";
+
+    }
+
+}
+
+
+
+/* =====================================
+   FOUND ITEMS
+===================================== */
+
+async function loadFoundItems() {
+
+
+    try {
+
+
+        const data =
+            await apiRequest(
+                "/found-items"
+            );
+
+
+        if (!data) return;
+
+
+        const items =
+            data.data ||
+            data.items ||
+            [];
+
+
+        document.getElementById(
+            "found-count"
+        ).textContent =
+            items.length;
+
+
+    } catch (error) {
+
+
+        console.error(
+            "Found items:",
+            error
+        );
+
+
+        document.getElementById(
+            "found-count"
+        ).textContent =
+            "0";
+
+    }
+
+}
+
+
+
+/* =====================================
+   MATCHES
+===================================== */
+
+async function loadMatches() {
+
+
+    try {
+
+
+        const data =
+            await apiRequest(
+                "/matches"
+            );
+
+
+        if (!data) return;
+
+
+        const matches =
+            data.data ||
+            data.matches ||
+            [];
+
+
+        document.getElementById(
+            "match-count"
+        ).textContent =
+            matches.length;
+
+
+    } catch (error) {
+
+
+        console.error(
+            "Matches:",
+            error
+        );
+
+
+        document.getElementById(
+            "match-count"
+        ).textContent =
+            "0";
+
+    }
+
+}
+
+
+
+/* =====================================
+   CLAIMS
+===================================== */
+
+async function loadClaims() {
+
+
+    try {
+
+
+        const data =
+            await apiRequest(
+                "/claims/my-claims"
+            );
+
+
+        if (!data) return;
+
+
+        const claims =
+            data.data ||
+            data.claims ||
+            [];
+
+
+        document.getElementById(
+            "claim-count"
+        ).textContent =
+            claims.length;
+
+
+    } catch (error) {
+
+
+        console.error(
+            "Claims:",
+            error
+        );
+
+
+        document.getElementById(
+            "claim-count"
+        ).textContent =
+            "0";
+
+    }
+
+}
+
+
+
+/* =====================================
+   NOTIFICATIONS
+===================================== */
+
+async function loadNotifications() {
+
+
+    try {
+
+
+        const data =
+            await apiRequest(
+                "/notifications"
+            );
+
+
+        if (!data) return;
+
+
+        const notifications =
+            data.data ||
+            data.notifications ||
+            [];
+
+
+        const unread =
+            notifications.filter(
+                notification =>
+                    !notification.is_read
+            ).length;
+
+
+        document.getElementById(
+            "notification-count"
+        ).textContent =
+            unread;
+
+
+        renderNotifications(
+            notifications
+        );
+
+
+    } catch (error) {
+
+
+        console.error(
+            "Notifications:",
+            error
+        );
+
+
+        document.getElementById(
+            "notification-count"
+        ).textContent =
+            "0";
+
+    }
+
+}
+
+
+
+/* =====================================
+   RECENT ITEMS
+===================================== */
+
+function renderRecentItems(
+    items,
+    type
+) {
+
+
+    const container =
+        document.getElementById(
+            "recent-items"
+        );
+
+
+    if (!items.length) {
+
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                You haven't reported any
+                items yet.
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    const recent =
+        items.slice(0, 5);
+
+
+    container.innerHTML =
+
+        recent.map(item => {
+
+
+            const itemName =
+                item.item_name ||
+                item.name ||
+                "Unnamed item";
+
+
+            const status =
+                item.status ||
+                type;
+
+
+            const location =
+                item.location_lost ||
+                item.location_found ||
+                "Campus";
+
+
+            return `
+
+                <div class="activity-item">
+
+
+                    <div class="activity-icon stat-green">
+
+                        ${
+                            type === "lost"
+                                ? "＋"
+                                : "✓"
+                        }
+
+                    </div>
+
+
+                    <div class="activity-info">
+
+
+                        <strong>
+
+                            ${
+                                escapeHTML(
+                                    itemName
+                                )
+                            }
+
+                        </strong>
+
+
+                        <span>
+
+                            ${
+                                escapeHTML(
+                                    location
+                                )
+                            }
+
+                        </span>
+
+
+                    </div>
+
+
+                    <span
+                        class="
+                            status
+                            status-${status}
+                        "
+                    >
+
+                        ${
+                            escapeHTML(
+                                status
+                            )
+                        }
+
+                    </span>
+
+
+                </div>
+
+            `;
+
+
+        }).join("");
+
+}
+
+
+
+/* =====================================
+   NOTIFICATIONS
+===================================== */
+
+function renderNotifications(
+    notifications
+) {
+
+
+    const container =
+        document.getElementById(
+            "recent-notifications"
+        );
+
+
+    if (!notifications.length) {
+
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                No notifications yet.
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+    const recent =
+        notifications.slice(0, 4);
+
+
+    container.innerHTML =
+
+        recent.map(notification => {
+
+
+            return `
+
+                <div class="activity-item">
+
+
+                    <div class="activity-icon stat-gold">
+                        ♢
+                    </div>
+
+
+                    <div class="activity-info">
+
+
+                        <strong>
+
+                            ${
+                                escapeHTML(
+                                    notification.title ||
+                                    "Notification"
+                                )
+                            }
+
+                        </strong>
+
+
+                        <span>
+
+                            ${
+                                escapeHTML(
+                                    notification.message ||
+                                    ""
+                                )
+                            }
+
+                        </span>
+
+
+                    </div>
+
+
+                </div>
+
+            `;
+
+
+        }).join("");
+
+}
+
+
+
+/* =====================================
+   HTML ESCAPING
+===================================== */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+document
+    .getElementById(
+        "logout-button"
+    )
+    .addEventListener(
+        "click",
+        function(event) {
+
+
+            event.preventDefault();
+
+
+            localStorage.removeItem(
+                "token"
+            );
+
+
+            localStorage.removeItem(
+                "user"
+            );
+
+
+            window.location.href =
+                "login.html";
+
+        }
+    );
+
+
+
+/* =====================================
+   MOBILE MENU
+===================================== */
+
+document
+    .getElementById(
+        "mobile-menu"
+    )
+    .addEventListener(
+        "click",
+        function() {
+
+
+            document
+                .getElementById(
+                    "sidebar"
+                )
+                .classList
+                .toggle("open");
+
+        }
+    );
+
+
+
+/* =====================================
+   LOAD DASHBOARD
+===================================== */
+
+async function loadDashboard() {
+
+
+    await Promise.all([
+
+        loadLostItems(),
+
+        loadFoundItems(),
+
+        loadMatches(),
+
+        loadClaims(),
+
+        loadNotifications()
+
+    ]);
+
+}
+
+
+loadDashboard();
+
+
+</script>
+
+
+</body>
+
+</html>

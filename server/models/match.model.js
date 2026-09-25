@@ -230,7 +230,45 @@ const getMatchesForFoundItem = async (foundItemId) => {
 
     return rows;
 };
+const updateItemStatusesAfterAcceptance = async (
+    lostItemId,
+    foundItemId
+) => {
+    const connection = await pool.getConnection();
 
+    try {
+        await connection.beginTransaction();
+
+        // Update lost item
+        await connection.execute(
+            `
+            UPDATE lost_items
+            SET status = 'matched'
+            WHERE id = ?
+            `,
+            [lostItemId]
+        );
+
+        // Update found item
+        await connection.execute(
+            `
+            UPDATE found_items
+            SET status = 'matched'
+            WHERE id = ?
+            `,
+            [foundItemId]
+        );
+
+        await connection.commit();
+
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+
+    } finally {
+        connection.release();
+    }
+};
 
 // ============================================================
 // EXPORT FUNCTIONS
@@ -241,6 +279,7 @@ module.exports = {
     getAllMatches,
     findMatchById,
     updateMatchStatus,
+    updateItemStatusesAfterAcceptance,
     getMatchesForLostItem,
     getMatchesForFoundItem
 };

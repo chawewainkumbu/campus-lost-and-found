@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Report Lost Item | Campus Lost & Found</title>
+
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <style>
+        /* =====================================================
+           LOST ITEM PAGE
+           ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f3ed;
+            color: #171717;
+            font-family: "Times New Roman", Times, serif;
+        }
+
+        .lost-page {
+            min-height: 100vh;
+        }
+
+        /* =====================================================
+           TOP BAR
+           ===================================================== */
+
+        .lost-header {
+            height: 76px;
+            background: #004d2f;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, .12);
+        }
+
+        .lost-brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .lost-brand img {
+            width: 48px;
+            height: 56px;
+            object-fit: contain;
+        }
+
+        .lost-brand h1 {
+            margin: 0;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .lost-brand p {
+            margin: 2px 0 0;
+            font-size: 12px;
+            opacity: .82;
+            letter-spacing: .4px;
+        }
+
+        .back-dashboard {
+            color: white;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,.5);
+            padding: 9px 16px;
+            font-size: 14px;
+            transition: .2s ease;
+        }
+
+        .back-dashboard:hover {
+            background: white;
+            color: #004d2f;
+        }
+
+        /* =====================================================
+           MAIN
+           ===================================================== */
+
+        .lost-main {
+            width: min(1050px, 92%);
+            margin: 42px auto 60px;
+        }
+
+        .page-heading {
+            margin-bottom: 28px;
+        }
+
+        .page-heading .eyebrow {
+            color: #b08a00;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1.8px;
+            margin-bottom: 7px;
+        }
+
+        .page-heading h2 {
+            margin: 0;
+            font-size: 34px;
+            color: #004d2f;
+        }
+
+        .page-heading p {
+            margin: 8px 0 0;
+            max-width: 690px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        /* =====================================================
+           FORM CARD
+           ===================================================== */
+
+        .form-card {
+            background: white;
+            border: 1px solid #dedbd2;
+            box-shadow: 0 8px 30px rgba(0,0,0,.06);
+        }
+
+        .form-top {
+            height: 7px;
+            background: linear-gradient(
+                to right,
+                #b50000 0%,
+                #b50000 33.33%,
+                #004d2f 33.33%,
+                #004d2f 66.66%,
+                #111 66.66%,
+                #111 100%
+            );
+        }
+
+        .form-body {
+            padding: 35px 42px 40px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 23px;
+            color: #004d2f;
+            font-size: 21px;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 4px;
+            height: 23px;
+            background: #b08a00;
+        }
+
+        /* =====================================================
+           FORM GRID
+           ===================================================== */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 21px 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 7px;
+            color: #292929;
+        }
+
+        .required {
+            color: #b50000;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid #cfcfcf;
+            background: #fff;
+            color: #222;
+            padding: 12px 13px;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        input,
+        select {
+            height: 46px;
+        }
+
+        textarea {
+            min-height: 115px;
+            resize: vertical;
+            line-height: 1.45;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #004d2f;
+            box-shadow: 0 0 0 3px rgba(0,77,47,.09);
+        }
+
+        .field-help {
+            margin-top: 5px;
+            color: #777;
+            font-size: 12px;
+        }
+
+        /* =====================================================
+           INFO NOTICE
+           ===================================================== */
+
+        .notice {
+            margin: 30px 0 27px;
+            padding: 15px 17px;
+            background: #f8f5e8;
+            border-left: 4px solid #b08a00;
+            color: #4d4630;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* =====================================================
+           STATUS MESSAGE
+           ===================================================== */
+
+        .status-message {
+            display: none;
+            padding: 13px 15px;
+            margin-bottom: 22px;
+            font-size: 14px;
+            border-left: 4px solid;
+        }
+
+        .status-message.success {
+            display: block;
+            background: #edf7f1;
+            color: #155c3b;
+            border-color: #168252;
+        }
+
+        .status-message.error {
+            display: block;
+            background: #fff0f0;
+            color: #8a1111;
+            border-color: #b50000;
+        }
+
+        /* =====================================================
+           ACTIONS
+           ===================================================== */
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid #e6e3dc;
+            padding-top: 25px;
+        }
+
+        .btn {
+            min-width: 145px;
+            height: 47px;
+            padding: 0 20px;
+            border: none;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .cancel-btn {
+            background: #eeeeeb;
+            color: #333;
+        }
+
+        .cancel-btn:hover {
+            background: #deddd7;
+        }
+
+        .submit-btn {
+            background: #004d2f;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background: #003c25;
+        }
+
+        .submit-btn:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+        }
+
+        /* =====================================================
+           FOOTER
+           ===================================================== */
+
+        .lost-footer {
+            margin-top: 35px;
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 700px) {
+
+            .lost-header {
+                height: auto;
+                min-height: 75px;
+                padding: 10px 5%;
+            }
+
+            .lost-brand h1 {
+                font-size: 17px;
+            }
+
+            .lost-brand p {
+                font-size: 10px;
+            }
+
+            .lost-brand img {
+                width: 40px;
+                height: 50px;
+            }
+
+            .back-dashboard {
+                padding: 7px 10px;
+                font-size: 12px;
+            }
+
+            .lost-main {
+                width: 94%;
+                margin-top: 28px;
+            }
+
+            .page-heading h2 {
+                font-size: 27px;
+            }
+
+            .page-heading p {
+                font-size: 14px;
+            }
+
+            .form-body {
+                padding: 25px 20px 30px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="lost-page">
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header class="lost-header">
+
+        <div class="lost-brand">
+
+            <img
+                src="./assets/unza-crest.png"
+                alt="University of Zambia Crest"
+            >
+
+            <div>
+                <h1>Campus Lost &amp; Found</h1>
+                <p>University of Zambia</p>
+            </div>
+
+        </div>
+
+        <a href="dashboard.html" class="back-dashboard">
+            ← Dashboard
+        </a>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="lost-main">
+
+        <div class="page-heading">
+
+            <div class="eyebrow">
+                LOST ITEM REPORT
+            </div>
+
+            <h2>Report a Lost Item</h2>
+
+            <p>
+                Provide accurate information about the item you lost.
+                The details you provide will help the system identify
+                possible matches with items that have been found on campus.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM CARD
+             ================================================= -->
+
+        <section class="form-card">
+
+            <div class="form-top"></div>
+
+            <div class="form-body">
+
+                <h3 class="section-title">
+                    Item Information
+                </h3>
+
+
+                <!-- STATUS MESSAGE -->
+
+                <div
+                    id="statusMessage"
+                    class="status-message"
+                    role="alert">
+                </div>
+
+
+                <!-- FORM -->
+
+                <form id="lostItemForm">
+
+                    <div class="form-grid">
+
+
+                        <!-- ITEM NAME -->
+
+                        <div class="form-group">
+
+                            <label for="item_name">
+                                Item Name <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="item_name"
+                                name="item_name"
+                                maxlength="150"
+                                placeholder="e.g. Black HP Laptop"
+                                required
+                            >
+
+                            <span class="field-help">
+                                Maximum 150 characters.
+                            </span>
+
+                        </div>
+
+
+                        <!-- CATEGORY -->
+
+                        <div class="form-group">
+
+                            <label for="category_id">
+                                Category <span class="required">*</span>
+                            </label>
+
+                            <select
+                                id="category_id"
+                                name="category_id"
+                                required
+                            >
+
+                                <option value="">
+                                    Select a category
+                                </option>
+
+                                <option value="1">
+                                    Electronics
+                                </option>
+
+                                <option value="2">
+                                    Books &amp; Stationery
+                                </option>
+
+                                <option value="3">
+                                    Clothing
+                                </option>
+
+                                <option value="4">
+                                    Accessories
+                                </option>
+
+                                <option value="5">
+                                    Keys
+                                </option>
+
+                                <option value="6">
+                                    Documents
+                                </option>
+
+                                <option value="7">
+                                    Other
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+
+                        <div class="form-group full">
+
+                            <label for="description">
+                                Description <span class="required">*</span>
+                            </label>
+
+                            <textarea
+                                id="description"
+                                name="description"
+                                placeholder="Describe the item, including its appearance, condition and anything else that may help identify it."
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- BRAND -->
+
+                        <div class="form-group">
+
+                            <label for="brand">
+                                Brand
+                            </label>
+
+                            <input
+                                type="text"
+                                id="brand"
+                                name="brand"
+                                maxlength="100"
+                                placeholder="e.g. HP, Samsung, Nike"
+                            >
+
+                        </div>
+
+
+                        <!-- COLOUR -->
+
+                        <div class="form-group">
+
+                            <label for="colour">
+                                Colour
+                            </label>
+
+                            <input
+                                type="text"
+                                id="colour"
+                                name="colour"
+                                maxlength="50"
+                                placeholder="e.g. Black"
+                            >
+
+                        </div>
+
+
+                        <!-- IDENTIFYING FEATURES -->
+
+                        <div class="form-group full">
+
+                            <label for="identifying_features">
+                                Identifying Features
+                            </label>
+
+                            <textarea
+                                id="identifying_features"
+                                name="identifying_features"
+                                placeholder="Mention scratches, stickers, serial markings, unique designs, damage or other identifying characteristics."
+                            ></textarea>
+
+                            <span class="field-help">
+                                Optional, but detailed information can make matching more accurate.
+                            </span>
+
+                        </div>
+
+
+                        <!-- LOCATION -->
+
+                        <div class="form-group">
+
+                            <label for="location_lost">
+                                Location Lost <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="location_lost"
+                                name="location_lost"
+                                maxlength="255"
+                                placeholder="e.g. UNZA Main Library"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- DATE -->
+
+                        <div class="form-group">
+
+                            <label for="date_lost">
+                                Date Lost <span class="required">*</span>
+                            </label>
+
+                            <input
+                                type="date"
+                                id="date_lost"
+                                name="date_lost"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         NOTICE
+                         ================================================= -->
+
+                    <div class="notice">
+
+                        <strong>Important:</strong>
+                        Please provide truthful and accurate information.
+                        Your report will be stored in the Campus Lost &amp;
+                        Found system and may be compared with found-item
+                        reports to identify a possible match.
+
+                    </div>
+
+
+                    <!-- =================================================
+                         ACTIONS
+                         ================================================= -->
+
+                    <div class="form-actions">
+
+                        <button
+                            type="button"
+                            class="btn cancel-btn"
+                            id="cancelBtn"
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn submit-btn"
+                            id="submitBtn"
+                        >
+                            Report Lost Item
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <div class="lost-footer">
+            © 2026 University of Zambia · Campus Lost &amp; Found
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+    const API_URL = "http://localhost:5000/api";
+
+    const form = document.getElementById("lostItemForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const statusMessage = document.getElementById("statusMessage");
+
+
+    // ========================================================
+    // CHECK LOGIN
+    // ========================================================
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+        window.location.href = "login.html";
+
+    }
+
+
+    // ========================================================
+    // SHOW MESSAGE
+    // ========================================================
+
+    function showMessage(message, type) {
+
+        statusMessage.textContent = message;
+
+        statusMessage.className =
+            `status-message ${type}`;
+
+    }
+
+
+    // ========================================================
+    // SUBMIT FORM
+    // ========================================================
+
+    form.addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        showMessage("", "");
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+
+
+        // ----------------------------------------------------
+        // COLLECT FORM DATA
+        // ----------------------------------------------------
+
+        const formData = {
+
+            category_id:
+                Number(document.getElementById("category_id").value),
+
+            item_name:
+                document.getElementById("item_name").value.trim(),
+
+            description:
+                document.getElementById("description").value.trim(),
+
+            brand:
+                document.getElementById("brand").value.trim() || null,
+
+            colour:
+                document.getElementById("colour").value.trim() || null,
+
+            identifying_features:
+                document
+                    .getElementById("identifying_features")
+                    .value
+                    .trim() || null,
+
+            location_lost:
+                document
+                    .getElementById("location_lost")
+                    .value
+                    .trim(),
+
+            date_lost:
+                document.getElementById("date_lost").value
+
+        };
+
+
+        // ----------------------------------------------------
+        // BASIC FRONTEND VALIDATION
+        // ----------------------------------------------------
+
+        if (!formData.category_id) {
+
+            showMessage(
+                "Please select an item category.",
+                "error"
+            );
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Report Lost Item";
+
+            return;
+        }
+
+
+        if (!formData.item_name) {
+
+            showMessage(
+                "Please enter the item name.",
+                "error"
+            );
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Report Lost Item";
+
+            return;
+        }
+
+
+        if (!formData.description) {
+
+            showMessage(
+                "Please provide a description of the item.",
+                "error"
+            );
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Report Lost Item";
+
+            return;
+        }
+
+
+        if (!formData.location_lost) {
+
+            showMessage(
+                "Please enter where the item was lost.",
+                "error"
+            );
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Report Lost Item";
+
+            return;
+        }
+
+
+        if (!formData.date_lost) {
+
+            showMessage(
+                "Please select the date the item was lost.",
+                "error"
+            );
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Report Lost Item";
+
+            return;
+        }
+
+
+        // ====================================================
+        // SEND TO BACKEND
+        // ====================================================
+
+        try {
+
+            const response = await fetch(
+                `${API_URL}/lost-items`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+
+                    body: JSON.stringify(formData)
+                }
+            );
+
+
+            const data = await response.json();
+
+
+            // ------------------------------------------------
+            // AUTHENTICATION ERROR
+            // ------------------------------------------------
+
+            if (response.status === 401) {
+
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+
+                window.location.href = "login.html";
+
+                return;
+            }
+
+
+            // ------------------------------------------------
+            // VALIDATION ERROR
+            // ------------------------------------------------
+
+            if (!response.ok) {
+
+                let message =
+                    data.message ||
+                    "Unable to report the lost item.";
+
+                if (data.errors && data.errors.length > 0) {
+
+                    message =
+                        data.errors
+                            .map(error => error.msg)
+                            .join(" ");
+
+                }
+
+                showMessage(message, "error");
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Report Lost Item";
+
+                return;
+            }
+
+
+            // ------------------------------------------------
+            // SUCCESS
+            // ------------------------------------------------
+
+            showMessage(
+                "Lost item reported successfully. Redirecting to your dashboard...",
+                "success"
+            );
+
+
+            form.reset();
+
+
+            setTimeout(() => {
+
+                window.location.href = "dashboard.html";
+
+            }, 1500);
+
+
+        } catch (error) {
+
+            console.error(
+                "Report lost item error:",
+                error
+            );
+
+            showMessage(
+                "Unable to connect to the server. Please make sure the Campus Lost & Found API is running.",
+                "error"
+            );
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Report Lost Item";
+
+        }
+
+    });
+
+
+    // ========================================================
+    // CANCEL
+    // ========================================================
+
+    cancelBtn.addEventListener("click", function() {
+
+        window.location.href = "dashboard.html";
+
+    });
+
+</script>
+
+</body>
+</html>

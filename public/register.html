@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register | Campus Lost & Found</title>
+
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <style>
+        /* =====================================================
+           REGISTER PAGE
+           ===================================================== */
+
+        .auth-page {
+            min-height: calc(100vh - 58px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 35px 20px;
+
+            background:
+                linear-gradient(
+                    rgba(0, 91, 59, .94),
+                    rgba(0, 61, 41, .97)
+                ),
+                url("./assets/unza-campus-hero.png");
+
+            background-size: cover;
+            background-position: center;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 920px;
+
+            display: grid;
+            grid-template-columns: 40% 60%;
+
+            background: #fff;
+
+            border-radius: 8px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, .25);
+        }
+
+
+        /* LEFT PANEL */
+
+        .register-info {
+            padding: 45px 35px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #006b3f,
+                    #003d29
+                );
+        }
+
+        .register-info img {
+            width: 75px;
+            height: 85px;
+
+            object-fit: contain;
+
+            margin-bottom: 20px;
+        }
+
+        .register-info h2 {
+            font-size: 30px;
+
+            line-height: 1.1;
+
+            margin-bottom: 15px;
+        }
+
+        .register-info h2 span {
+            color: #f4c300;
+        }
+
+        .register-info p {
+            color: rgba(255,255,255,.78);
+
+            font-family: Arial, sans-serif;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+        }
+
+        .register-benefits {
+            margin-top: 25px;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 12px;
+        }
+
+        .register-benefits div {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 11px;
+        }
+
+        .register-benefits span {
+            width: 23px;
+            height: 23px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            color: #111;
+
+            background: #f4c300;
+
+            font-weight: bold;
+        }
+
+
+        /* RIGHT PANEL */
+
+        .register-form-section {
+            padding: 40px 45px;
+
+            background: #fff;
+        }
+
+        .form-heading {
+            margin-bottom: 25px;
+        }
+
+        .form-heading h1 {
+            color: #006b3f;
+
+            font-size: 30px;
+
+            margin-bottom: 5px;
+        }
+
+        .form-heading p {
+            color: #777;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 12px;
+        }
+
+
+        /* FORM */
+
+        .register-form {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            margin-bottom: 6px;
+
+            color: #333;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+
+            height: 42px;
+
+            padding: 0 12px;
+
+            border: 1px solid #d8d8d8;
+
+            border-radius: 3px;
+
+            outline: none;
+
+            background: #fafafa;
+
+            color: #222;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 12px;
+
+            transition: .2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #006b3f;
+
+            background: white;
+
+            box-shadow:
+                0 0 0 3px rgba(0,107,63,.08);
+        }
+
+
+        /* PASSWORD */
+
+        .password-note {
+            margin-top: 5px;
+
+            color: #999;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 9px;
+        }
+
+
+        /* ERROR / SUCCESS */
+
+        .form-message {
+            grid-column: 1 / -1;
+
+            display: none;
+
+            padding: 10px;
+
+            border-radius: 3px;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 11px;
+        }
+
+        .form-message.error {
+            display: block;
+
+            color: #9d1016;
+
+            background: #fde7e7;
+
+            border: 1px solid #f2bcbc;
+        }
+
+        .form-message.success {
+            display: block;
+
+            color: #075f38;
+
+            background: #e6f5ec;
+
+            border: 1px solid #b7dfc6;
+        }
+
+
+        /* SUBMIT */
+
+        .register-submit {
+            grid-column: 1 / -1;
+
+            height: 45px;
+
+            border: none;
+
+            border-radius: 3px;
+
+            cursor: pointer;
+
+            color: #111;
+
+            background: #f4c300;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            transition: .2s ease;
+        }
+
+        .register-submit:hover {
+            background: #e8b900;
+
+            transform: translateY(-1px);
+        }
+
+        .register-submit:disabled {
+            opacity: .6;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+
+        /* LOGIN LINK */
+
+        .login-link {
+            grid-column: 1 / -1;
+
+            text-align: center;
+
+            margin-top: 5px;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 11px;
+
+            color: #777;
+        }
+
+        .login-link a {
+            color: #d71920;
+
+            font-weight: 700;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 750px) {
+
+            .register-container {
+                grid-template-columns: 1fr;
+
+                max-width: 550px;
+            }
+
+            .register-info {
+                padding: 30px;
+
+                min-height: 250px;
+            }
+
+            .register-info img {
+                width: 55px;
+                height: 60px;
+
+                margin-bottom: 10px;
+            }
+
+            .register-info h2 {
+                font-size: 25px;
+            }
+
+            .register-benefits {
+                display: none;
+            }
+
+            .register-form-section {
+                padding: 30px 25px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .register-form {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .register-submit,
+            .form-message,
+            .login-link {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVBAR
+         ===================================================== -->
+
+    <header class="navbar">
+
+        <div class="brand">
+
+            <img
+                src="./assets/unza-crest.png"
+                alt="University of Zambia Crest"
+                class="crest"
+            >
+
+            <div class="brand-text">
+
+                <h2>
+                    The University of Zambia
+                </h2>
+
+                <h1>
+                    Campus Lost &amp; Found
+                </h1>
+
+                <p>
+                    Report · Match · Recover
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="index.html#about">
+                About
+            </a>
+
+            <a href="login.html">
+                Login
+            </a>
+
+            <a href="register.html" class="register">
+                Register
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =====================================================
+         REGISTER
+         ===================================================== -->
+
+    <main class="auth-page">
+
+        <div class="register-container">
+
+
+            <!-- LEFT INFORMATION -->
+
+            <section class="register-info">
+
+                <img
+                    src="./assets/unza-crest.png"
+                    alt="University of Zambia Crest"
+                >
+
+                <h2>
+                    Join the
+                    <span>Campus Community</span>
+                </h2>
+
+                <p>
+                    Create your account to report lost or found
+                    property, receive possible matches and track
+                    your claims.
+                </p>
+
+
+                <div class="register-benefits">
+
+                    <div>
+                        <span>✓</span>
+                        Report lost items
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Report found items
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Receive match notifications
+                    </div>
+
+                    <div>
+                        <span>✓</span>
+                        Track your claims
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- FORM -->
+
+            <section class="register-form-section">
+
+                <div class="form-heading">
+
+                    <h1>
+                        Create Account
+                    </h1>
+
+                    <p>
+                        Enter your details to get started.
+                    </p>
+
+                </div>
+
+
+                <form
+                    id="registerForm"
+                    class="register-form"
+                >
+
+
+                    <!-- FULL NAME -->
+
+                    <div class="form-group full">
+
+                        <label for="full_name">
+                            Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="full_name"
+                            name="full_name"
+                            placeholder="Enter your full name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- STUDENT NUMBER -->
+
+                    <div class="form-group">
+
+                        <label for="student_number">
+                            Student / Staff Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="student_number"
+                            name="student_number"
+                            placeholder="e.g. 20260001"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- ROLE -->
+
+                    <div class="form-group">
+
+                        <label for="role">
+                            Account Type
+                        </label>
+
+                        <select
+                            id="role"
+                            name="role"
+                            required
+                        >
+
+                            <option value="">
+                                Select account type
+                            </option>
+
+                            <option value="student">
+                                Student
+                            </option>
+
+                            <option value="staff">
+                                Staff
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="form-group">
+
+                        <label for="password">
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            required
+                            minlength="8"
+                        >
+
+                        <span class="password-note">
+                            Minimum 8 characters
+                        </span>
+
+                    </div>
+
+
+                    <!-- CONFIRM PASSWORD -->
+
+                    <div class="form-group">
+
+                        <label for="confirm_password">
+                            Confirm Password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="Repeat your password"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- MESSAGE -->
+
+                    <div
+                        id="formMessage"
+                        class="form-message"
+                    ></div>
+
+
+                    <!-- SUBMIT -->
+
+                    <button
+                        type="submit"
+                        id="registerButton"
+                        class="register-submit"
+                    >
+                        Create Account
+                    </button>
+
+
+                    <!-- LOGIN -->
+
+                    <div class="login-link">
+
+                        Already have an account?
+
+                        <a href="login.html">
+                            Login here
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
+    <script src="./js/api.js"></script>
+
+    <script>
+
+        const form = document.getElementById("registerForm");
+        const message = document.getElementById("formMessage");
+        const button = document.getElementById("registerButton");
+
+
+        form.addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+
+            /* Clear previous message */
+
+            message.className = "form-message";
+            message.textContent = "";
+
+
+            /* Get values */
+
+            const full_name =
+                document.getElementById("full_name").value.trim();
+
+            const student_number =
+                document.getElementById("student_number").value.trim();
+
+            const email =
+                document.getElementById("email").value.trim();
+
+            const role =
+                document.getElementById("role").value;
+
+            const password =
+                document.getElementById("password").value;
+
+            const confirm_password =
+                document.getElementById("confirm_password").value;
+
+
+            /* Password check */
+
+            if (password !== confirm_password) {
+
+                message.textContent =
+                    "Passwords do not match.";
+
+                message.className =
+                    "form-message error";
+
+                return;
+            }
+
+
+            /* Disable button */
+
+            button.disabled = true;
+
+            button.textContent = "Creating Account...";
+
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:5000/api/auth/register",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            full_name,
+                            student_number,
+                            email,
+                            password,
+                            role
+                        })
+                    }
+                );
+
+
+                const data = await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message ||
+                        "Registration failed."
+                    );
+
+                }
+
+
+                /* SUCCESS */
+
+                message.textContent =
+                    "Account created successfully! Redirecting to login...";
+
+                message.className =
+                    "form-message success";
+
+
+                form.reset();
+
+
+                setTimeout(() => {
+
+                    window.location.href = "login.html";
+
+                }, 1800);
+
+
+            } catch (error) {
+
+                message.textContent =
+                    error.message ||
+                    "Unable to connect to the server.";
+
+                message.className =
+                    "form-message error";
+
+            } finally {
+
+                button.disabled = false;
+
+                button.textContent =
+                    "Create Account";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>

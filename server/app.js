@@ -3,11 +3,10 @@ const lostItemRoutes = require("./routes/lostItem.routes");
 const express = require("express");
 const cors = require("cors");
 const matchRoutes = require("./routes/match.routes");
-
 const authRoutes = require("./routes/auth.routes");
-
 const app = express();
-
+const claimRoutes = require("./routes/claim.routes");
+const notificationRoutes = require("./routes/notification.routes");
 
 // ============================================================
 // MIDDLEWARE
@@ -38,6 +37,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/lost-items", lostItemRoutes);
 app.use("/api/found-items", foundItemRoutes);
 app.use("/api/matches", matchRoutes);
+app.use("/api/claims", claimRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 
 // ============================================================

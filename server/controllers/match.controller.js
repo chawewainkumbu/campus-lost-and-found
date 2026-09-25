@@ -1,5 +1,6 @@
 const matchModel = require("../models/match.model");
 const matchingService = require("../services/matching.service");
+const notificationService = require("../services/notification.service");
 
 // ============================================================
 // CREATE MATCH
@@ -130,17 +131,30 @@ const updateMatchStatus = async (req, res) => {
             });
         }
 
-        const affectedRows = await matchModel.updateMatchStatus(
-            id,
-            status
-        );
+        // Get the match first
+        const match = await matchModel.findMatchById(id);
 
-        if (affectedRows === 0) {
+        if (!match) {
             return res.status(404).json({
                 success: false,
                 message: "Match not found"
             });
         }
+
+        // Update match status
+        await matchModel.updateMatchStatus(id, status);
+
+        // If the match is accepted,
+        // update both item statuses
+        if (status === "accepted") {
+            await matchModel.updateItemStatusesAfterAcceptance(
+                match.lost_item_id,
+                match.found_item_id
+            );
+        }
+        if (status === "accepted") {
+    await notificationService.notifyMatchAccepted(match);
+}
 
         return res.status(200).json({
             success: true,
@@ -156,7 +170,6 @@ const updateMatchStatus = async (req, res) => {
         });
     }
 };
-
 
 // ============================================================
 // GET MATCHES FOR LOST ITEM
