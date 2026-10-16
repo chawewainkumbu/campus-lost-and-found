@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Claims | Campus Lost &amp; Found</title>
+  <link rel="stylesheet" href="./css/styles.css">
+
+  <style>
+    :root {
+      --green: #006b3f;
+      --gold: #f4c430;
+      --orange: #f58220;
+      --ink: #202820;
+      --muted: #66736b;
+      --line: #dce5df;
+      --bg: #f4f7f5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Times New Roman", serif;
+    }
+
+    .topbar {
+      background: var(--green);
+      color: #fff;
+      padding: 16px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand { font-size: 1.35rem; font-weight: bold; }
+
+    .topbar a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 16px;
+    }
+
+    .stripes { height: 6px; display: flex; }
+    .stripes span { flex: 1; }
+    .s1 { background: #006b3f; }
+    .s2 { background: #f4c430; }
+    .s3 { background: #ce2029; }
+    .s4 { background: #f58220; }
+
+    .layout {
+      max-width: 1200px;
+      margin: 28px auto;
+      padding: 0 18px;
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: 24px;
+    }
+
+    .sidebar, .panel, .stat {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px #102a1b0a;
+    }
+
+    .sidebar { padding: 16px; height: max-content; }
+
+    .sidebar h3 {
+      margin: 4px 10px 14px;
+      color: var(--green);
+    }
+
+    .nav {
+      display: block;
+      padding: 11px 12px;
+      margin: 4px 0;
+      text-decoration: none;
+      color: var(--ink);
+      border-radius: 8px;
+    }
+
+    .nav:hover, .nav.active {
+      background: #e7f3ec;
+      color: var(--green);
+      font-weight: bold;
+    }
+
+    main h1 { margin: 0 0 6px; color: var(--green); }
+
+    .sub { color: var(--muted); margin: 0 0 20px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat { padding: 16px; }
+    .stat span { display: block; color: var(--muted); }
+    .stat strong {
+      display: block;
+      font-size: 1.8rem;
+      color: var(--green);
+      margin-top: 5px;
+    }
+
+    .panel { padding: 18px; margin-bottom: 20px; }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      color: var(--green);
+    }
+
+    .form-intro {
+      color: var(--muted);
+      margin: 0 0 16px;
+    }
+
+    .field { margin-bottom: 15px; }
+
+    .field label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .field input, .field textarea {
+      display: block;
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #cbd7cf;
+      border-radius: 8px;
+      font: inherit;
+      background: #fff;
+    }
+
+    .field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .field input:focus, .field textarea:focus {
+      outline: 2px solid #a6d8ba;
+      border-color: var(--green);
+    }
+
+    .help {
+      display: block;
+      color: var(--muted);
+      font-size: .92rem;
+      margin-top: 5px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .filters input, .filters select {
+      font: inherit;
+      padding: 10px 12px;
+      border: 1px solid #cbd7cf;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .filters input { flex: 1; min-width: 200px; }
+
+    .claim-list { display: grid; gap: 14px; }
+
+    .claim-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .claim-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .claim-card h3 { margin: 0 0 8px; color: var(--green); }
+    .claim-card p { margin: 6px 0; }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      background: #e8f3ec;
+      color: #006b3f;
+      font-size: .9rem;
+    }
+
+    .pending { background: #fff4d2; color: #805e00; }
+    .rejected, .cancelled { background: #fde8e8; color: #a51622; }
+    .approved { background: #e1f4e8; color: #176c3d; }
+
+    .btn {
+      border: 0;
+      border-radius: 7px;
+      padding: 10px 14px;
+      font: inherit;
+      cursor: pointer;
+      background: var(--green);
+      color: #fff;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn.secondary { background: #e8eee9; color: var(--green); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    .message, .empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .error { color: #a51622; }
+
+    .success {
+      color: #176c3d;
+      background: #e1f4e8;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .meta { font-size: .92rem; color: var(--muted); }
+
+    footer {
+      text-align: center;
+      padding: 22px;
+      color: var(--muted);
+    }
+
+    [hidden] { display: none !important; }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: flex; gap: 4px; flex-wrap: wrap; }
+      .sidebar h3 { width: 100%; }
+      .nav { padding: 8px; }
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+<header class="topbar">
+  <div class="brand">UNZA | Campus Lost &amp; Found</div>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="browse-items.html">Browse Items</a>
+    <a href="#" id="logoutLink">Log out</a>
+  </nav>
+</header>
+
+<div class="stripes">
+  <span class="s1"></span>
+  <span class="s2"></span>
+  <span class="s3"></span>
+  <span class="s4"></span>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h3>Student Menu</h3>
+    <a class="nav" href="dashboard.html">Dashboard</a>
+    <a class="nav" href="lost-item.html">Report Lost Item</a>
+    <a class="nav" href="found-item.html">Report Found Item</a>
+    <a class="nav" href="my-items.html">My Items</a>
+    <a class="nav" href="browse-items.html">Browse Items</a>
+    <a class="nav" href="matches.html">Matches</a>
+    <a class="nav active" href="claims.html">My Claims</a>
+    <a class="nav" href="notifications.html">Notifications</a>
+  </aside>
+
+  <main>
+    <h1>My Claims</h1>
+    <p class="sub">Submit a claim for a matched item and track its review status.</p>
+
+    <!-- New claim form -->
+    <section class="panel" id="claimFormPanel" hidden>
+      <h2>Submit a Claim</h2>
+      <p class="form-intro">
+        Explain why you believe this found item belongs to you. Include identifying
+        details that may help staff verify ownership.
+      </p>
+
+      <div id="formMessage" role="status" aria-live="polite"></div>
+
+      <form id="claimForm">
+        <div class="field">
+          <label for="foundItemId">Found item ID</label>
+          <input id="foundItemId" name="found_item_id" type="text" readonly required>
+          <span class="help">This is filled in automatically from the selected match.</span>
+        </div>
+
+        <div class="field">
+          <label for="matchId">Match ID</label>
+          <input id="matchId" name="match_id" type="text" readonly required>
+        </div>
+
+        <div class="field">
+          <label for="claimDescription">Why do you believe this item is yours?</label>
+          <textarea
+            id="claimDescription"
+            name="claim_description"
+            minlength="10"
+            maxlength="2000"
+            placeholder="Describe unique features, contents, stickers, serial numbers, or other details that help prove ownership."
+            required
+          ></textarea>
+          <span class="help">Provide specific details that staff can use to verify your claim.</span>
+        </div>
+
+        <button class="btn" id="submitClaimButton" type="submit">Submit Claim</button>
+        <a class="btn secondary" href="matches.html">Back to Matches</a>
+      </form>
+    </section>
+
+    <div id="pageMessage" role="status" aria-live="polite"></div>
+
+    <section class="stats">
+      <div class="stat">
+        <span>Total claims</span>
+        <strong id="totalCount">—</strong>
+      </div>
+      <div class="stat">
+        <span>Pending</span>
+        <strong id="pendingCount">—</strong>
+      </div>
+      <div class="stat">
+        <span>Approved</span>
+        <strong id="approvedCount">—</strong>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="filters">
+        <input id="searchInput" type="search" placeholder="Search item or claim description…">
+        <select id="statusFilter">
+          <option value="all">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <div id="message" class="message">Loading your claims…</div>
+      <div id="claimList" class="claim-list"></div>
+    </section>
+  </main>
+</div>
+
+<footer>Knowledge, Service and Excellence · Campus Lost &amp; Found</footer>
+
+<script>
+(() => {
+  const API_URL = "http://localhost:5000/api";
+  const token = localStorage.getItem("token");
+
+  const list = document.getElementById("claimList");
+  const message = document.getElementById("message");
+  const formPanel = document.getElementById("claimFormPanel");
+  const form = document.getElementById("claimForm");
+  const formMessage = document.getElementById("formMessage");
+  const submitButton = document.getElementById("submitClaimButton");
+
+  let claims = [];
+
+  document.getElementById("logoutLink").onclick = event => {
+    event.preventDefault();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    location.href = "login.html";
+  };
+
+  const esc = value =>
+    String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char]));
+
+  function unwrap(data) {
+    if (Array.isArray(data)) return data;
+
+    for (const key of ["claims", "items", "data", "results"]) {
+      if (Array.isArray(data?.[key])) return data[key];
+      if (Array.isArray(data?.[key]?.claims)) return data[key].claims;
+    }
+
+    return [];
+  }
+
+  async function api(path, options = {}) {
+    const response = await fetch(API_URL + path, {
+      ...options,
+      headers: {
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {})
+      }
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      location.href = "login.html";
+      throw new Error("Your session has expired. Please sign in again.");
+    }
+
+    if (!response.ok || data.success === false) {
+      throw new Error(data.message || `Request failed (${response.status}).`);
+    }
+
+    return data;
+  }
+
+  function formatDate(value) {
+    if (!value) return "Not provided";
+
+    const parsed = new Date(value);
+
+    return Number.isNaN(parsed.getTime())
+      ? value
+      : parsed.toLocaleDateString();
+  }
+
+  function showFormMessage(text, type = "error") {
+    formMessage.className = type === "success" ? "success" : "message error";
+    formMessage.textContent = text;
+  }
+
+  function initialiseClaimForm() {
+    const params = new URLSearchParams(window.location.search);
+    const matchId = params.get("match_id");
+    const foundItemId = params.get("found_item_id");
+
+    // The form is shown only when opened with a selected match.
+    if (!matchId && !foundItemId) return;
+
+    formPanel.hidden = false;
+
+    if (!matchId || !foundItemId) {
+      showFormMessage(
+        "The match details are incomplete. Return to Matches and select a valid match."
+      );
+      submitButton.disabled = true;
+      return;
+    }
+
+    if (!/^\d+$/.test(matchId) || !/^\d+$/.test(foundItemId)) {
+      showFormMessage("The selected match or found item ID is invalid.");
+      submitButton.disabled = true;
+      return;
+    }
+
+    document.getElementById("matchId").value = matchId;
+    document.getElementById("foundItemId").value = foundItemId;
+  }
+
+  function render() {
+    const query = document.getElementById("searchInput").value
+      .toLowerCase()
+      .trim();
+
+    const status = document.getElementById("statusFilter").value;
+
+    const rows = claims.filter(claim => {
+      const claimStatus = String(claim.status || "pending").toLowerCase();
+
+      const searchable = [
+        claim.item_name,
+        claim.found_item_name,
+        claim.claim_description,
+        claim.verification_notes,
+        claim.description
+      ].join(" ").toLowerCase();
+
+      return (!query || searchable.includes(query)) &&
+        (status === "all" || claimStatus === status);
+    });
+
+    document.getElementById("totalCount").textContent = claims.length;
+
+    document.getElementById("pendingCount").textContent =
+      claims.filter(c => String(c.status).toLowerCase() === "pending").length;
+
+    document.getElementById("approvedCount").textContent =
+      claims.filter(c => String(c.status).toLowerCase() === "approved").length;
+
+    list.innerHTML = "";
+
+    message.className = "message";
+    message.textContent = rows.length ? "" : "No claims match your filters.";
+
+    rows.forEach(claim => {
+      const statusValue = String(claim.status || "pending").toLowerCase();
+      const claimId = claim.id ?? claim.claim_id ?? "?";
+
+      const itemName =
+        claim.item_name ||
+        claim.found_item_name ||
+        `Found item #${claim.found_item_id ?? "?"}`;
+
+      const card = document.createElement("article");
+      card.className = "claim-card";
+
+      card.innerHTML = `
+        <div class="claim-head">
+          <div>
+            <h3>${esc(itemName)}</h3>
+            <span class="pill ${esc(statusValue)}">
+              ${esc(statusValue.charAt(0).toUpperCase() + statusValue.slice(1))}
+            </span>
+            <span class="pill">Claim #${esc(claimId)}</span>
+          </div>
+          <span class="meta">Submitted: ${esc(formatDate(claim.created_at))}</span>
+        </div>
+
+        <p>
+          <strong>Claim explanation:</strong>
+          ${esc(claim.claim_description || claim.description || "No explanation returned by the API.")}
+        </p>
+
+        <p>
+          <strong>Verification notes:</strong>
+          ${esc(claim.verification_notes || "No review notes yet.")}
+        </p>
+
+        <p class="meta">
+          Found item ID: ${esc(claim.found_item_id ?? "Not provided")}
+          · Match ID: ${esc(claim.match_id ?? "Not provided")}
+        </p>
+
+        ${
+          statusValue === "pending" && claimId !== "?"
+            ? `<div style="margin-top:12px">
+                 <button class="btn secondary" type="button" data-cancel="${esc(claimId)}">
+                   Cancel claim
+                 </button>
+               </div>`
+            : ""
+        }
+      `;
+
+      list.appendChild(card);
+    });
+  }
+
+  async function loadClaims() {
+    if (!token) {
+      location.href = "login.html";
+      return;
+    }
+
+    message.className = "message";
+    message.textContent = "Loading your claims…";
+
+    try {
+      claims = unwrap(await api("/claims/my-claims"));
+      render();
+    } catch (error) {
+      message.className = "message error";
+      message.textContent = error.message || "Unable to load claims.";
+      list.innerHTML = "";
+    }
+  }
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const matchId = document.getElementById("matchId").value.trim();
+    const foundItemId = document.getElementById("foundItemId").value.trim();
+    const description = document.getElementById("claimDescription").value.trim();
+
+    if (!token) {
+      location.href = "login.html";
+      return;
+    }
+
+    if (!matchId || !foundItemId) {
+      showFormMessage("Match ID and found item ID are required.");
+      return;
+    }
+
+    if (description.length < 10) {
+      showFormMessage("Please provide at least 10 characters explaining your claim.");
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting…";
+    formMessage.textContent = "";
+
+    try {
+      const result = await api("/claims", {
+        method: "POST",
+        body: JSON.stringify({
+          found_item_id: Number(foundItemId),
+          match_id: Number(matchId),
+          claim_description: description
+        })
+      });
+
+      showFormMessage(
+        result.message || "Your claim was submitted successfully.",
+        "success"
+      );
+
+      form.reset();
+
+      // Hide the form after a successful submission so it cannot be
+      // accidentally submitted again from this page.
+      formPanel.hidden = true;
+
+      // Remove selected match parameters from the address bar.
+      window.history.replaceState({}, "", window.location.pathname);
+
+      await loadClaims();
+    } catch (error) {
+      showFormMessage(error.message || "Unable to submit your claim.");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit Claim";
+    }
+  });
+
+  list.addEventListener("click", async event => {
+    const button = event.target.closest("[data-cancel]");
+
+    if (!button) return;
+
+    const id = button.dataset.cancel;
+
+    if (!id || id === "undefined") {
+      alert("This claim has no ID, so it cannot be cancelled.");
+      return;
+    }
+
+    if (!confirm(`Cancel claim #${id}?`)) return;
+
+    button.disabled = true;
+
+    try {
+      const result = await api(
+        `/claims/${encodeURIComponent(id)}/cancel`,
+        { method: "PATCH" }
+      );
+
+      alert(result.message || "Claim cancelled.");
+      await loadClaims();
+    } catch (error) {
+      alert(
+        "Unable to cancel this claim. The backend may not support the cancellation route yet.\n" +
+        error.message
+      );
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  document.getElementById("searchInput").addEventListener("input", render);
+  document.getElementById("statusFilter").addEventListener("change", render);
+
+  initialiseClaimForm();
+  loadClaims();
+})();
+</script>
+</body>
+</html>

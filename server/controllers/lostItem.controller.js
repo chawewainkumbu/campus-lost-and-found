@@ -1,11 +1,11 @@
 const { validationResult } = require("express-validator");
-
+const matchingService = require("../services/matching.service");
 const {
     createLostItem,
     getAllLostItems,
-    findLostItemById
+    findLostItemById,
+    getMyLostItems
 } = require("../models/lostItem.model");
-
 
 // ============================================================
 // REPORT LOST ITEM
@@ -51,7 +51,13 @@ const reportLostItem = async (req, res) => {
         });
 
         const lostItem = await findLostItemById(lostItemId);
-
+// Generate potential matches without failing the report itself
+// if matching encounters an unexpected error.
+try {
+    await matchingService.findMatchesForLostItem(lostItemId);
+} catch (matchingError) {
+    console.error("Automatic matching for lost item failed:", matchingError);
+}
         return res.status(201).json({
             success: true,
             message: "Lost item reported successfully",
@@ -156,9 +162,35 @@ const getLostItem = async (req, res) => {
     }
 };
 
+// ============================================================
+// GET MY LOST ITEMS
+// ============================================================
+
+const getMyLostItemsController = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const items = await getMyLostItems(userId);
+
+        return res.status(200).json({
+            success: true,
+            count: items.length,
+            items
+        });
+
+    } catch (error) {
+        console.error("Get my lost items error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while retrieving your lost items"
+        });
+    }
+};
 
 module.exports = {
     reportLostItem,
     getLostItems,
-    getLostItem
+    getLostItem,
+    getMyLostItemsController
 };

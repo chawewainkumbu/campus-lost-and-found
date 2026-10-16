@@ -14,32 +14,51 @@ const notifyUser = async (userId, title, message, type = "system") => {
 };
 
 
-// Notify the owner when a match is accepted
+// Notify the lost-item owner and found-item reporter
+// when a match is accepted.
 const notifyMatchAccepted = async (match) => {
-    const [rows] = await pool.execute(
-        `
-        SELECT 
-            li.user_id,
-            li.item_name
-        FROM lost_items li
-        WHERE li.id = ?
-        `,
+    const [lostItems] = await pool.execute(
+        `SELECT user_id, item_name
+         FROM lost_items
+         WHERE id = ?`,
         [match.lost_item_id]
     );
 
-    if (!rows.length) return;
-
-    const lostItem = rows[0];
-
-    await notifyUser(
-        lostItem.user_id,
-        "Match Found",
-        `A possible match has been accepted for your lost item: ${lostItem.item_name}. You can now submit a claim.`,
-        "match"
+    const [foundItems] = await pool.execute(
+        `SELECT user_id, item_name
+         FROM found_items
+         WHERE id = ?`,
+        [match.found_item_id]
     );
+
+    if (lostItems.length) {
+        const lostItem = lostItems[0];
+
+        await notifyUser(
+            lostItem.user_id,
+            "Match Found",
+            `A possible match has been accepted for your lost item: ${lostItem.item_name}. You can now submit a claim.`,
+            "match"
+        );
+    }
+
+    if (foundItems.length) {
+        const foundItem = foundItems[0];
+
+        // Avoid sending two notifications to the same user.
+        if (
+            !lostItems.length ||
+            Number(foundItem.user_id) !== Number(lostItems[0].user_id)
+        ) {
+            await notifyUser(
+                foundItem.user_id,
+                "Match Accepted",
+                `Your found item "${foundItem.item_name}" has been matched with a lost-item report.`,
+                "match"
+            );
+        }
+    }
 };
-
-
 // Notify staff and administrators about a new claim
 const notifyStaffAboutClaim = async (claim) => {
     const [users] = await pool.execute(

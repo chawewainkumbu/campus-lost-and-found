@@ -18,12 +18,6 @@ const createClaim = async (req, res) => {
 
         const user_id = req.user.id;
 
-await notificationService.notifyStaffAboutClaim({
-    found_item_id,
-    user_id: req.user.id,
-    match_id
-});
-        
         // --------------------------------------------------------
         // Validate required fields
         // --------------------------------------------------------
@@ -152,8 +146,11 @@ await notificationService.notifyStaffAboutClaim({
         // --------------------------------------------------------
 
         const claim = await claimModel.findClaimById(claimId);
-
-
+await notificationService.notifyStaffAboutClaim({
+    found_item_id,
+    user_id,
+    match_id
+});
         return res.status(201).json({
             success: true,
             message: "Claim submitted successfully",
@@ -358,36 +355,42 @@ const updateClaimStatus = async (req, res) => {
 // ============================================================
 
 const completeItemReturn = async (req, res) => {
-
     try {
-
         const { id } = req.params;
+
+        // Get the authenticated staff member's ID
+        const returnedBy = req.user.id;
 
         const claim = await claimModel.findClaimById(id);
 
-
         if (!claim) {
-
             return res.status(404).json({
                 success: false,
                 message: "Claim not found"
             });
         }
 
-
         if (claim.status !== "approved") {
-
             return res.status(400).json({
                 success: false,
                 message: "Only approved claims can be returned"
             });
         }
 
+        const result = await claimModel.completeItemReturn(
+            id,
+            returnedBy
+        );
 
-        const result = await claimModel.completeItemReturn(id);
-        
-
-await notificationService.notifyItemReturned(claim);
+        // Notify the claimant after the database transaction succeeds
+        try {
+            await notificationService.notifyItemReturned(claim);
+        } catch (notificationError) {
+            console.error(
+                "Return notification failed:",
+                notificationError
+            );
+        }
 
         return res.status(200).json({
             success: true,
@@ -396,8 +399,25 @@ await notificationService.notifyItemReturned(claim);
         });
 
     } catch (error) {
-
         console.error("Complete Item Return Error:", error);
+
+        if (error.message === "Claim not found") {
+            return res.status(404).json({
+                success: false,
+                message: error.message
+            });
+        }
+
+        if (
+            error.message === "Only approved claims can be returned" ||
+            error.message === "This item has already been returned" ||
+            error.message === "This item is not eligible for return"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
 
         return res.status(500).json({
             success: false,

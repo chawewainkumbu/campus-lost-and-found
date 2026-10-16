@@ -266,13 +266,13 @@ const updateItemStatusesAfterApproval = async (foundItemId) => {
 // COMPLETE ITEM RETURN
 // ============================================================
 
-const completeItemReturn = async (claimId) => {
+const completeItemReturn = async (claimId, returnedBy) => {
     const connection = await pool.getConnection();
 
     try {
         await connection.beginTransaction();
 
-        // Get claim and related match
+        // Retrieve and lock the claim
         const [claims] = await connection.execute(
             `
             SELECT
@@ -285,6 +285,7 @@ const completeItemReturn = async (claimId) => {
             LEFT JOIN item_matches im
                 ON c.match_id = im.id
             WHERE c.id = ?
+            FOR UPDATE
             `,
             [claimId]
         );
@@ -296,15 +297,44 @@ const completeItemReturn = async (claimId) => {
         const claim = claims[0];
 
         if (claim.status !== "approved") {
-            throw new Error("Only approved claims can be returned");
+            throw new Error(
+                "Only approved claims can be returned"
+            );
         }
 
         if (!claim.lost_item_id) {
             throw new Error("No matching lost item found");
         }
 
-        // Update found item
-        await connection.execute(
+        // Lock the found item
+        const [foundItems] = await connection.execute(
+            `
+            SELECT id, status
+            FROM found_items
+            WHERE id = ?
+            FOR UPDATE
+            `,
+            [claim.found_item_id]
+        );
+
+        if (foundItems.length === 0) {
+            throw new Error("Found item not found");
+        }
+
+        if (foundItems[0].status === "returned") {
+            throw new Error("This item has already been returned");
+        }
+
+        if (
+            !["found", "matched", "claimed"].includes(
+                foundItems[0].status
+            )
+        ) {
+            throw new Error("This item is not eligible for return");
+        }
+
+        // Update the found item
+        const [foundUpdate] = await connection.execute(
             `
             UPDATE found_items
             SET status = 'returned'
@@ -313,8 +343,12 @@ const completeItemReturn = async (claimId) => {
             [claim.found_item_id]
         );
 
-        // Close lost item
-        await connection.execute(
+        if (foundUpdate.affectedRows !== 1) {
+            throw new Error("Failed to update found item status");
+        }
+
+        // Close the lost item report
+        const [lostUpdate] = await connection.execute(
             `
             UPDATE lost_items
             SET status = 'closed'
@@ -323,12 +357,35 @@ const completeItemReturn = async (claimId) => {
             [claim.lost_item_id]
         );
 
+        if (lostUpdate.affectedRows !== 1) {
+            throw new Error("Failed to close lost item report");
+        }
+
+        // Record who completed the return and when
+        const [claimUpdate] = await connection.execute(
+            `
+            UPDATE claims
+            SET returned_by = ?,
+                returned_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+              AND status = 'approved'
+            `,
+            [returnedBy, claimId]
+        );
+
+        if (claimUpdate.affectedRows !== 1) {
+            throw new Error("Failed to record item return");
+        }
+
         await connection.commit();
 
         return {
             claim_id: claim.id,
             found_item_id: claim.found_item_id,
-            lost_item_id: claim.lost_item_id
+            lost_item_id: claim.lost_item_id,
+            returned_by: returnedBy,
+            found_item_status: "returned",
+            lost_item_status: "closed"
         };
 
     } catch (error) {

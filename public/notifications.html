@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications | Campus Lost &amp; Found</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <style>
+    :root{--green:#006b3f;--gold:#f4c430;--orange:#f58220;--ink:#202820;--muted:#66736b;--line:#dce5df;--bg:#f4f7f5}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Times New Roman",serif}
+    .topbar{background:var(--green);color:#fff;padding:16px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.brand{font-size:1.35rem;font-weight:bold}.topbar a{color:#fff;text-decoration:none;margin-left:16px}
+    .stripes{height:6px;display:flex}.stripes span{flex:1}.s1{background:#006b3f}.s2{background:#f4c430}.s3{background:#ce2029}.s4{background:#f58220}
+    .layout{max-width:1200px;margin:28px auto;padding:0 18px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px}.sidebar,.panel,.stat{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 4px 15px #102a1b0a}.sidebar{padding:16px;height:max-content}.sidebar h3{margin:4px 10px 14px;color:var(--green)}
+    .nav{display:block;padding:11px 12px;margin:4px 0;text-decoration:none;color:var(--ink);border-radius:8px}.nav:hover,.nav.active{background:#e7f3ec;color:var(--green);font-weight:bold}
+    main h1{margin:0 0 6px;color:var(--green)}.sub{color:var(--muted);margin:0 0 20px}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px}.stat{padding:16px}.stat span{display:block;color:var(--muted)}.stat strong{display:block;font-size:1.8rem;color:var(--green);margin-top:5px}
+    .panel{padding:18px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:16px}.filters{display:flex;gap:10px;flex-wrap:wrap}.filters input,.filters select{font:inherit;padding:10px 12px;border:1px solid #cbd7cf;border-radius:8px;background:#fff}.filters input{min-width:220px}
+    .btn{border:0;border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer;background:var(--green);color:white}.btn.secondary{background:#e8eee9;color:var(--green)}.btn:disabled{opacity:.55;cursor:wait}
+    .notification-list{display:grid;gap:10px}.notification{border:1px solid var(--line);border-left:5px solid #9ca9a0;border-radius:9px;padding:15px;background:#fff}.notification.unread{border-left-color:var(--green);background:#f4fbf6}.notification h3{margin:0 0 7px;font-size:1.1rem}.notification p{margin:5px 0 10px;line-height:1.4}.meta{font-size:.92rem;color:var(--muted)}.type{display:inline-block;padding:4px 8px;border-radius:20px;background:#e8eee9;color:#43534a;font-size:.85rem}.unread-label{color:var(--green);font-weight:bold;font-size:.9rem;margin-left:7px}
+    .message,.empty{padding:24px;text-align:center;color:var(--muted)}.error{color:#a51622}footer{text-align:center;padding:22px;color:var(--muted)}
+    @media(max-width:760px){.layout{grid-template-columns:1fr}.sidebar{display:flex;gap:4px;flex-wrap:wrap}.sidebar h3{width:100%}.nav{padding:8px}.stats{grid-template-columns:1fr}.filters input{min-width:0;width:100%}}
+  </style>
+</head>
+<body>
+<header class="topbar"><div class="brand">UNZA | Campus Lost &amp; Found</div><nav><a href="dashboard.html">Dashboard</a><a href="browse-items.html">Browse Items</a><a href="#" id="logoutLink">Log out</a></nav></header>
+<div class="stripes"><span class="s1"></span><span class="s2"></span><span class="s3"></span><span class="s4"></span></div>
+<div class="layout">
+  <aside class="sidebar"><h3>Student Menu</h3>
+    <a class="nav" href="dashboard.html">Dashboard</a><a class="nav" href="lost-item.html">Report Lost Item</a><a class="nav" href="found-item.html">Report Found Item</a><a class="nav" href="my-items.html">My Items</a><a class="nav" href="browse-items.html">Browse Items</a><a class="nav" href="matches.html">Matches</a><a class="nav" href="claims.html">My Claims</a><a class="nav active" href="notifications.html">Notifications</a>
+  </aside>
+  <main>
+    <h1>Notifications</h1><p class="sub">Stay up to date on potential matches, claim decisions, and item status changes.</p>
+    <section class="stats"><div class="stat"><span>Total notifications</span><strong id="totalCount">—</strong></div><div class="stat"><span>Unread</span><strong id="unreadCount">—</strong></div><div class="stat"><span>Read</span><strong id="readCount">—</strong></div></section>
+    <section class="panel">
+      <div class="toolbar"><div class="filters"><input type="search" id="searchInput" placeholder="Search notifications…"><select id="statusFilter"><option value="all">All notifications</option><option value="unread">Unread only</option><option value="read">Read only</option></select><select id="typeFilter"><option value="all">All types</option><option value="match">Matches</option><option value="claim">Claims</option><option value="status_update">Status updates</option><option value="system">System</option></select></div><button class="btn" id="readAllBtn">Mark all as read</button></div>
+      <div id="message" class="message">Loading notifications…</div><div id="notificationList" class="notification-list"></div>
+    </section>
+  </main>
+</div>
+<footer>Knowledge, Service and Excellence · Campus Lost &amp; Found</footer>
+<script>
+(() => {
+  const API_URL="http://localhost:5000/api", token=localStorage.getItem("token");
+  const list=document.getElementById("notificationList"), message=document.getElementById("message");
+  let notifications=[];
+  document.getElementById("logoutLink").onclick=e=>{e.preventDefault();localStorage.removeItem("token");localStorage.removeItem("user");location.href="login.html";};
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  function unwrap(d){if(Array.isArray(d))return d;for(const k of ["notifications","items","data","results"])if(Array.isArray(d?.[k]))return d[k];return [];}
+  async function api(path,options={}){const r=await fetch(API_URL+path,{...options,headers:{"Content-Type":"application/json",...(token?{Authorization:`Bearer ${token}`}:{}) ,...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(r.status===401){localStorage.removeItem("token");location.href="login.html";throw Error("Your session expired. Please sign in again.");}if(!r.ok||d.success===false)throw Error(d.message||`Request failed (${r.status})`);return d;}
+  function readState(n){return Boolean(n.is_read===1||n.is_read===true||n.is_read==="1"||n.read===true||n.status==="read");}
+  function render(){
+    const q=document.getElementById("searchInput").value.toLowerCase().trim(),state=document.getElementById("statusFilter").value,type=document.getElementById("typeFilter").value;
+    const unread=notifications.filter(n=>!readState(n)).length;
+    document.getElementById("totalCount").textContent=notifications.length;document.getElementById("unreadCount").textContent=unread;document.getElementById("readCount").textContent=notifications.length-unread;
+    const rows=notifications.filter(n=>{const isRead=readState(n),t=String(n.type||"system").toLowerCase(),hay=[n.title,n.message,n.type].join(" ").toLowerCase();return(!q||hay.includes(q))&&(state==="all"||(state==="read"&&isRead)||(state==="unread"&&!isRead))&&(type==="all"||t===type);});
+    list.innerHTML="";message.className="message";message.textContent=rows.length?"":"No notifications match these filters.";
+    rows.forEach(n=>{const id=n.id??n.notification_id,read=readState(n),card=document.createElement("article");card.className="notification"+(read?"":" unread");card.innerHTML=`<h3>${esc(n.title||"Notification")}${read?"":'<span class="unread-label">NEW</span>'}</h3><p>${esc(n.message||"No message content.")}</p><div class="toolbar"><div><span class="type">${esc(String(n.type||"system").replace("_"," "))}</span> <span class="meta">${esc(n.created_at?new Date(n.created_at).toLocaleString():"")}</span></div>${!read&&id!=null?`<button class="btn secondary" data-read="${esc(id)}">Mark as read</button>`:""}</div>`;list.appendChild(card);});
+  }
+  async function load(){if(!token){location.href="login.html";return;}try{notifications=unwrap(await api("/notifications"));render();}catch(e){message.className="message error";message.textContent=e.message||"Unable to load notifications.";list.innerHTML="";}}
+  list.addEventListener("click",async e=>{const b=e.target.closest("[data-read]");if(!b)return;b.disabled=true;try{await api(`/notifications/${encodeURIComponent(b.dataset.read)}/read`,{method:"PATCH"});const n=notifications.find(x=>String(x.id??x.notification_id)===String(b.dataset.read));if(n){n.is_read=1;n.read=true;}render();}catch(err){alert(err.message);}finally{b.disabled=false;}});
+  document.getElementById("readAllBtn").onclick=async e=>{const b=e.currentTarget;if(!notifications.some(n=>!readState(n)))return alert("All notifications are already marked as read.");b.disabled=true;try{await api("/notifications/read-all",{method:"PATCH"});notifications.forEach(n=>{n.is_read=1;n.read=true;});render();}catch(err){alert(err.message);}finally{b.disabled=false;}};
+  ["searchInput","statusFilter","typeFilter"].forEach(id=>document.getElementById(id).addEventListener(id==="searchInput"?"input":"change",render));
+  load();
+})();
+</script>
+</body>
+</html>

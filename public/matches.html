@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matches | Campus Lost & Found</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <style>
+    :root{--green:#006b3f;--gold:#f4c430;--orange:#f58220;--ink:#202820;--muted:#66736b;--line:#dce5df;--surface:#fff;--bg:#f4f7f5}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Times New Roman",serif}
+    .topbar{background:var(--green);color:#fff;padding:16px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .brand{font-size:1.35rem;font-weight:bold}.topbar a{color:#fff;text-decoration:none;margin-left:16px}
+    .stripes{height:6px;display:flex}.stripes span{flex:1}.s1{background:#006b3f}.s2{background:#f4c430}.s3{background:#ce2029}.s4{background:#f58220}
+    .layout{max-width:1200px;margin:28px auto;padding:0 18px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px}
+    .sidebar,.panel,.stat{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 4px 15px #102a1b0a}
+    .sidebar{padding:16px;height:max-content}.sidebar h3{margin:4px 10px 14px;color:var(--green)}
+    .nav{display:block;padding:11px 12px;margin:4px 0;text-decoration:none;color:var(--ink);border-radius:8px}.nav:hover,.nav.active{background:#e7f3ec;color:var(--green);font-weight:bold}
+    main h1{margin:0 0 6px;color:var(--green)}.sub{color:var(--muted);margin:0 0 20px}
+    .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px}.stat{padding:16px}.stat span{display:block;color:var(--muted);font-size:.95rem}.stat strong{display:block;font-size:1.8rem;color:var(--green);margin-top:5px}
+    .panel{padding:18px}.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.filters input,.filters select{font:inherit;padding:10px 12px;border:1px solid #cbd7cf;border-radius:8px;background:#fff}.filters input{flex:1;min-width:200px}
+    .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}.tab{border:1px solid var(--green);background:#fff;color:var(--green);padding:8px 14px;border-radius:20px;cursor:pointer;font:inherit}.tab.active{background:var(--green);color:#fff}
+    .match-list{display:grid;gap:14px}.match-card{border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start}
+    .match-card h3{margin:0 0 8px}.match-card p{margin:5px 0;color:#45534a}.pill{display:inline-block;padding:4px 9px;border-radius:20px;background:#e8f3ec;color:#006b3f;font-size:.9rem;margin:2px 4px 2px 0}.status{background:#fff4d2;color:#805e00}.score{font-size:1.15rem;font-weight:bold;color:var(--green);white-space:nowrap}
+    .empty,.message{padding:24px;text-align:center;color:var(--muted)}.error{color:#a51622}.btn{display:inline-block;border:0;border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer;background:var(--green);color:white}.btn.secondary{background:#e8eee9;color:var(--green)}.btn:disabled{opacity:.55;cursor:not-allowed}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.meta{font-size:.92rem;color:var(--muted)}footer{text-align:center;padding:22px;color:var(--muted)}
+    @media(max-width:760px){.layout{grid-template-columns:1fr}.sidebar{display:flex;gap:4px;flex-wrap:wrap}.sidebar h3{width:100%}.nav{padding:8px}.stats{grid-template-columns:1fr}.match-card{grid-template-columns:1fr}.score{grid-row:1}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">UNZA | Campus Lost &amp; Found</div>
+    <nav><a href="dashboard.html">Dashboard</a><a href="browse-items.html">Browse Items</a><a href="#" id="logoutLink">Log out</a></nav>
+  </header>
+  <div class="stripes"><span class="s1"></span><span class="s2"></span><span class="s3"></span><span class="s4"></span></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <h3>Student Menu</h3>
+      <a class="nav" href="dashboard.html">Dashboard</a>
+      <a class="nav" href="lost-item.html">Report Lost Item</a>
+      <a class="nav" href="found-item.html">Report Found Item</a>
+      <a class="nav" href="my-items.html">My Items</a>
+      <a class="nav" href="browse-items.html">Browse Items</a>
+      <a class="nav active" href="matches.html">Matches</a>
+      <a class="nav" href="claims.html">My Claims</a>
+      <a class="nav" href="notifications.html">Notifications</a>
+    </aside>
+    <main>
+      <h1>Potential Matches</h1>
+      <p class="sub">Review possible matches between items reported lost and items reported found.</p>
+      <section class="stats">
+        <div class="stat"><span>Matches shown</span><strong id="totalCount">—</strong></div>
+        <div class="stat"><span>Pending review</span><strong id="pendingCount">—</strong></div>
+        <div class="stat"><span>Accepted matches</span><strong id="acceptedCount">—</strong></div>
+      </section>
+      <section class="panel">
+        <div class="filters">
+          <input type="search" id="searchInput" placeholder="Search item name, location or description…">
+          <select id="statusFilter"><option value="all">All match statuses</option><option value="pending">Pending</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option></select>
+          <select id="sortSelect"><option value="score">Highest score first</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select>
+        </div>
+        <div class="tabs">
+          <button class="tab active" data-kind="all">All matches</button>
+          <button class="tab" data-kind="mine">Matches involving my lost items</button>
+        </div>
+        <div id="message" class="message">Loading matches…</div>
+        <div id="matchList" class="match-list"></div>
+      </section>
+    </main>
+  </div>
+  <footer>Knowledge, Service and Excellence · Campus Lost &amp; Found</footer>
+<script>
+(() => {
+  const API_URL = "http://localhost:5000/api";
+  const token = localStorage.getItem("token");
+  const list = document.getElementById("matchList");
+  const message = document.getElementById("message");
+  const searchInput = document.getElementById("searchInput");
+  const statusFilter = document.getElementById("statusFilter");
+  const sortSelect = document.getElementById("sortSelect");
+  let matches = [];
+  let kind = "all";
+
+  document.getElementById("logoutLink").addEventListener("click", e => {
+    e.preventDefault();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+  });
+
+  async function api(path, options = {}) {
+    const response = await fetch(API_URL + path, {
+      ...options,
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(options.headers || {}) }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+      throw new Error("Your session expired. Please sign in again.");
+    }
+    if (!response.ok || data.success === false) throw new Error(data.message || `Request failed (${response.status})`);
+    return data;
+  }
+
+  function unwrap(data) {
+    if (Array.isArray(data)) return data;
+    for (const key of ["matches", "items", "data", "results"]) if (Array.isArray(data?.[key])) return data[key];
+    return [];
+  }
+  function value(obj, keys, fallback = "Not provided") {
+    for (const key of keys) if (obj?.[key] !== undefined && obj[key] !== null && obj[key] !== "") return obj[key];
+    return fallback;
+  }
+  function escapeHtml(text) {
+    return String(text ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  }
+  function dateText(raw) {
+    if (!raw || raw === "Not provided") return "Not provided";
+    const d = new Date(raw);
+    return Number.isNaN(d.getTime()) ? raw : d.toLocaleDateString();
+  }
+  function statusPill(status) {
+    const s = String(status || "pending").toLowerCase();
+    return `<span class="pill ${s === "pending" ? "status" : ""}">${escapeHtml(s.charAt(0).toUpperCase()+s.slice(1))}</span>`;
+  }
+  function itemDetails(m, prefix) {
+    const nested = m[prefix] || m[prefix + "_item"] || {};
+    return {
+      id: value(m, [prefix + "_item_id", prefix + "_id"], value(nested, ["id"], "?")),
+      name: value(m, [prefix + "_item_name"], value(nested, ["item_name","name"])),
+      description: value(m, [prefix + "_description"], value(nested, ["description"], "")),
+      location: value(m, [prefix + "_location", prefix + "_location_lost", prefix + "_location_found"], value(nested, ["location_lost","location_found","location"])),
+      date: value(m, [prefix + "_date", prefix + "_date_lost", prefix + "_date_found"], value(nested, ["date_lost","date_found"]))
+    };
+  }
+  function normalized(m) {
+    const lost = itemDetails(m, "lost");
+    const found = itemDetails(m, "found");
+    return {
+      raw:m, id:value(m, ["id","match_id"], "?"),
+      lost, found,
+      score:Number(value(m, ["match_score","score","similarity_score"], 0)),
+      status:String(value(m, ["status"], "pending")).toLowerCase(),
+      created:value(m, ["created_at","matched_at"], ""),
+      lostUserId:value(m, ["lost_user_id"], value(m.lost_item || {}, ["user_id"], null)),
+      searchable:[lost.name,lost.description,lost.location,found.name,found.description,found.location].join(" ").toLowerCase()
+    };
+  }
+  function filtered() {
+    let rows = matches.map(normalized);
+    if (kind === "mine") {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const uid = user.id ?? user.user_id;
+      if (uid != null) rows = rows.filter(m => String(m.lostUserId) === String(uid));
+    }
+    const q = searchInput.value.trim().toLowerCase();
+    if (q) rows = rows.filter(m => m.searchable.includes(q));
+    if (statusFilter.value !== "all") rows = rows.filter(m => m.status === statusFilter.value);
+    if (sortSelect.value === "score") rows.sort((a,b) => b.score-a.score);
+    else rows.sort((a,b) => {
+      const diff = new Date(a.created || 0) - new Date(b.created || 0);
+      return sortSelect.value === "newest" ? -diff : diff;
+    });
+    return rows;
+  }
+  function render() {
+    const rows = filtered();
+    document.getElementById("totalCount").textContent = rows.length;
+    document.getElementById("pendingCount").textContent = matches.filter(m => String(m.status).toLowerCase()==="pending").length;
+    document.getElementById("acceptedCount").textContent = matches.filter(m => String(m.status).toLowerCase()==="accepted").length;
+    list.innerHTML = "";
+    message.className = "message";
+    message.textContent = rows.length ? "" : "No matches found for these filters.";
+    rows.forEach(m => {
+      const card = document.createElement("article");
+      card.className = "match-card";
+      const score = Number.isFinite(m.score) ? `${m.score.toFixed(1)}%` : "—";
+      card.innerHTML = `
+        <div>
+          <h3>${escapeHtml(m.lost.name)} <span aria-hidden="true">↔</span> ${escapeHtml(m.found.name)}</h3>
+          <div>${statusPill(m.status)} <span class="pill">Match #${escapeHtml(m.id)}</span></div>
+          <p><strong>Lost item:</strong> ${escapeHtml(m.lost.name)} · ${escapeHtml(m.lost.location)} · ${escapeHtml(dateText(m.lost.date))}</p>
+          <p><strong>Found item:</strong> ${escapeHtml(m.found.name)} · ${escapeHtml(m.found.location)} · ${escapeHtml(dateText(m.found.date))}</p>
+          <p><strong>Details:</strong> ${escapeHtml(m.lost.description)} / ${escapeHtml(m.found.description)}</p>
+          <p class="meta">Created: ${escapeHtml(dateText(m.created))}</p>
+          <div class="actions">
+            <button class="btn secondary" data-action="view" data-id="${escapeHtml(m.id)}">View details</button>
+            ${m.status === "pending" ? `<button class="btn" data-action="accept" data-id="${escapeHtml(m.id)}">Accept match</button><button class="btn secondary" data-action="reject" data-id="${escapeHtml(m.id)}">Reject</button>` : ""}
+            ${m.status === "accepted" ? `
+  <a class="btn"
+     href="claims.html?match_id=${encodeURIComponent(m.id)}&found_item_id=${encodeURIComponent(m.found.id)}">
+     Submit Claim
+  </a>
+` : ""}
+          </div>
+        </div><div class="score">${escapeHtml(score)}<div class="meta">match score</div></div>`;
+      list.appendChild(card);
+    });
+  }
+  async function load() {
+    if (!token) { window.location.href = "login.html"; return; }
+    try {
+      // The API route is expected to return matches for the signed-in user.
+      const data = await api("/matches");
+      matches = unwrap(data);
+      message.textContent = matches.length ? "" : "No matches are available yet. Report an item and check again later.";
+      render();
+    } catch (error) {
+      message.className = "message error";
+      message.textContent = error.message || "Could not load matches.";
+      list.innerHTML = "";
+    }
+  }
+  list.addEventListener("click", async e => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+    const id = btn.dataset.id, action = btn.dataset.action;
+    const match = matches.map(normalized).find(m => String(m.id) === String(id));
+    if (!match) return;
+    if (action === "view") {
+      alert(`Match #${match.id}\nStatus: ${match.status}\nScore: ${match.score.toFixed(1)}%\n\nLost: ${match.lost.name}\nLocation: ${match.lost.location}\nDetails: ${match.lost.description}\n\nFound: ${match.found.name}\nLocation: ${match.found.location}\nDetails: ${match.found.description}`);
+      return;
+    }
+    const endpoint = action === "accept" ? `/matches/${encodeURIComponent(id)}/accept` : `/matches/${encodeURIComponent(id)}/reject`;
+    if (!confirm(`${action === "accept" ? "Accept" : "Reject"} match #${id}?`)) return;
+    btn.disabled = true;
+    try {
+      const data = await api(endpoint, { method:"PATCH" });
+      alert(data.message || `Match ${action}ed.`);
+      await load();
+    } catch (error) {
+      alert(error.message + "\nIf this action is not supported by the API, it will need to be connected to the backend route.");
+    } finally { btn.disabled = false; }
+  });
+  [searchInput,statusFilter,sortSelect].forEach(el => el.addEventListener("input",render));
+  document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active"); kind = btn.dataset.kind; render();
+  }));
+  load();
+})();
+</script>
+</body>
+</html>

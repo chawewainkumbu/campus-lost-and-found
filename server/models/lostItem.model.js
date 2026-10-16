@@ -256,9 +256,40 @@ const findLostItemById = async (id) => {
     return rows[0];
 };
 
+// ============================================================
+// GET LOST ITEMS REPORTED BY THE LOGGED-IN USER
+// ============================================================
+
+const getMyLostItems = async (userId) => {
+    const [rows] = await pool.execute(
+        `SELECT
+            li.id,
+            li.user_id,
+            li.category_id,
+            c.name AS category_name,
+            li.item_name,
+            li.description,
+            li.brand,
+            li.colour,
+            li.identifying_features,
+            li.location_lost,
+            li.date_lost,
+            li.status,
+            li.created_at,
+            li.updated_at
+        FROM lost_items li
+        LEFT JOIN categories c ON li.category_id = c.id
+        WHERE li.user_id = ?
+        ORDER BY li.created_at DESC`,
+        [userId]
+    );
+
+    return rows;
+};
 
 module.exports = {
     createLostItem,
     getAllLostItems,
-    findLostItemById
+    findLostItemById,
+    getMyLostItems
 };

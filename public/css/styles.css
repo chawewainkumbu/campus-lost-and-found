@@ -861,6 +861,10 @@ a {
     flex-direction: column;
 }
 
+.stripe-orange {
+    background-color: #f58220;
+}
+
 .stripe {
     width: 100%;
 

@@ -271,11 +271,50 @@ const updateItemStatusesAfterAcceptance = async (
 };
 
 // ============================================================
+// CREATE OR UPDATE MATCH
+// ============================================================
+
+const createOrUpdateMatch = async ({
+    lost_item_id,
+    found_item_id,
+    match_score
+}) => {
+    const [existing] = await pool.execute(
+        `SELECT id
+         FROM item_matches
+         WHERE lost_item_id = ? AND found_item_id = ?
+         LIMIT 1`,
+        [lost_item_id, found_item_id]
+    );
+
+    if (existing.length > 0) {
+        await pool.execute(
+            `UPDATE item_matches
+             SET match_score = ?
+             WHERE id = ?`,
+            [match_score, existing[0].id]
+        );
+
+        return existing[0].id;
+    }
+
+    const [result] = await pool.execute(
+        `INSERT INTO item_matches
+            (lost_item_id, found_item_id, match_score)
+         VALUES (?, ?, ?)`,
+        [lost_item_id, found_item_id, match_score]
+    );
+
+    return result.insertId;
+};
+
+// ============================================================
 // EXPORT FUNCTIONS
 // ============================================================
 
 module.exports = {
     createMatch,
+    createOrUpdateMatch,
     getAllMatches,
     findMatchById,
     updateMatchStatus,

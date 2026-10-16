@@ -7,10 +7,23 @@ const authenticate = require("../middleware/auth.middleware");
 const {
     reportFoundItem,
     getFoundItems,
-    getFoundItem
+    getFoundItem,
+    getMyFoundItemsController
 } = require("../controllers/foundItem.controller");
 
 const createFoundItemValidator = require("../validators/foundItem.validator");
+
+
+// ============================================================
+// GET MY FOUND ITEMS
+// Must appear before /:id
+// ============================================================
+
+router.get(
+    "/my-items",
+    authenticate,
+    getMyFoundItemsController
+);
 
 
 // ============================================================

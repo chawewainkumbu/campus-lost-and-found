@@ -259,6 +259,36 @@ const findFoundItemById = async (id) => {
     return rows[0];
 };
 
+// ============================================================
+// GET FOUND ITEMS REPORTED BY THE LOGGED-IN USER
+// ============================================================
+
+const getMyFoundItems = async (userId) => {
+    const [rows] = await pool.execute(
+        `SELECT
+            fi.id,
+            fi.user_id,
+            fi.category_id,
+            c.name AS category_name,
+            fi.item_name,
+            fi.description,
+            fi.brand,
+            fi.colour,
+            fi.identifying_features,
+            fi.location_found,
+            fi.date_found,
+            fi.status,
+            fi.created_at,
+            fi.updated_at
+        FROM found_items fi
+        LEFT JOIN categories c ON fi.category_id = c.id
+        WHERE fi.user_id = ?
+        ORDER BY fi.created_at DESC`,
+        [userId]
+    );
+
+    return rows;
+};
 
 // ============================================================
 // EXPORT FUNCTIONS
@@ -267,5 +297,6 @@ const findFoundItemById = async (id) => {
 module.exports = {
     createFoundItem,
     getAllFoundItems,
-    findFoundItemById
+    findFoundItemById,
+    getMyFoundItems
 };

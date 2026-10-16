@@ -1,75 +1,52 @@
 const { validationResult } = require("express-validator");
-
+const matchingService = require("../services/matching.service");
 const {
     createFoundItem,
     getAllFoundItems,
-    findFoundItemById
+    findFoundItemById,
+    getMyFoundItems
 } = require("../models/foundItem.model");
 
 
 // ============================================================
 // REPORT FOUND ITEM
 // ============================================================
-
 const reportFoundItem = async (req, res) => {
+    const foundItemId = await createFoundItem({
+    user_id,
+    category_id,
+    item_name,
+    description,
+    brand,
+    colour,
+    identifying_features,
+    location_found,
+    date_found
+});
 
-    try {
+const foundItem = await findFoundItemById(foundItemId);
 
-        const errors = validationResult(req);
+try {
+    const matches =
+        await matchingService.findMatchesForFoundItem(foundItemId);
 
-        if (!errors.isEmpty()) {
-            return res.status(400).json({
-                success: false,
-                message: "Validation failed",
-                errors: errors.array()
-            });
-        }
+    console.log(
+        `Automatic matching completed for found item ${foundItemId}:`,
+        matches
+    );
+} catch (matchingError) {
+    console.error(
+        "Automatic matching for found item failed:",
+        matchingError
+    );
+}
 
-        const user_id = req.user.id;
-
-        const {
-            category_id,
-            item_name,
-            description,
-            brand,
-            colour,
-            identifying_features,
-            location_found,
-            date_found
-        } = req.body;
-
-        const foundItemId = await createFoundItem({
-            user_id,
-            category_id,
-            item_name,
-            description,
-            brand,
-            colour,
-            identifying_features,
-            location_found,
-            date_found
-        });
-
-        const foundItem = await findFoundItemById(foundItemId);
-
-        return res.status(201).json({
-            success: true,
-            message: "Found item reported successfully",
-            item: foundItem
-        });
-
-    } catch (error) {
-
-        console.error("Report found item error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Server error while reporting found item"
-        });
-    }
+return res.status(201).json({
+    success: true,
+    message: "Found item reported successfully",
+    item: foundItem
+});
 };
-
-
 // ============================================================
 // GET ALL FOUND ITEMS
 // ============================================================
@@ -151,8 +128,36 @@ const getFoundItem = async (req, res) => {
 };
 
 
+// ============================================================
+// GET MY FOUND ITEMS
+// ============================================================
+
+const getMyFoundItemsController = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const items = await getMyFoundItems(userId);
+
+        return res.status(200).json({
+            success: true,
+            count: items.length,
+            items
+        });
+
+    } catch (error) {
+        console.error("Get my found items error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while retrieving your found items"
+        });
+    }
+};
+
+
 module.exports = {
     reportFoundItem,
     getFoundItems,
-    getFoundItem
+    getFoundItem,
+    getMyFoundItemsController
 };

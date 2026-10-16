@@ -7,10 +7,23 @@ const authenticate = require("../middleware/auth.middleware");
 const {
     reportLostItem,
     getLostItems,
-    getLostItem
+    getLostItem,
+    getMyLostItemsController
 } = require("../controllers/lostItem.controller");
 
 const createLostItemValidator = require("../validators/lostItem.validator");
+
+
+// ============================================================
+// GET MY LOST ITEMS
+// Must appear before GET /:id
+// ============================================================
+
+router.get(
+    "/my-items",
+    authenticate,
+    getMyLostItemsController
+);
 
 
 // ============================================================

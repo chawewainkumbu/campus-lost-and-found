@@ -1,29 +1,23 @@
 const pool = require("../config/database");
-
+const matchModel = require("../models/match.model");
 
 // ============================================================
 // TEXT NORMALIZATION
 // ============================================================
 
 const normalizeText = (value) => {
-
     if (!value) {
         return "";
     }
 
-    return value
-        .toString()
-        .toLowerCase()
-        .trim();
+    return value.toString().toLowerCase().trim();
 };
-
 
 // ============================================================
 // TEXT SIMILARITY
 // ============================================================
 
 const textSimilarity = (text1, text2) => {
-
     const a = normalizeText(text1);
     const b = normalizeText(text2);
 
@@ -35,23 +29,18 @@ const textSimilarity = (text1, text2) => {
         return 1;
     }
 
-    // Check whether one value contains the other
     if (a.includes(b) || b.includes(a)) {
         return 0.8;
     }
 
-    // Compare individual words
     const wordsA = new Set(a.split(/\s+/));
     const wordsB = new Set(b.split(/\s+/));
 
-    const intersection = [...wordsA].filter(word =>
+    const intersection = [...wordsA].filter((word) =>
         wordsB.has(word)
     );
 
-    const union = new Set([
-        ...wordsA,
-        ...wordsB
-    ]);
+    const union = new Set([...wordsA, ...wordsB]);
 
     if (union.size === 0) {
         return 0;
@@ -60,13 +49,11 @@ const textSimilarity = (text1, text2) => {
     return intersection.length / union.size;
 };
 
-
 // ============================================================
 // DATE SIMILARITY
 // ============================================================
 
 const dateSimilarity = (date1, date2) => {
-
     if (!date1 || !date2) {
         return 0;
     }
@@ -88,68 +75,46 @@ const dateSimilarity = (date1, date2) => {
     const differenceDays =
         differenceMilliseconds / (1000 * 60 * 60 * 24);
 
-
-    // Same day
     if (differenceDays === 0) {
         return 1;
     }
 
-    // Within 1 week
     if (differenceDays <= 7) {
         return 0.8;
     }
 
-    // Within 30 days
     if (differenceDays <= 30) {
         return 0.5;
     }
 
-    // More than 30 days apart
     return 0;
 };
-
 
 // ============================================================
 // CALCULATE MATCH SCORE
 // ============================================================
 
 const calculateMatchScore = (lostItem, foundItem) => {
-
     let score = 0;
 
-
-    // --------------------------------------------------------
-    // CATEGORY — 20%
-    // --------------------------------------------------------
-
+    // Category: 20%
     if (
-        lostItem.category_id &&
-        foundItem.category_id &&
-        lostItem.category_id === foundItem.category_id
+        lostItem.category_id != null &&
+        foundItem.category_id != null &&
+        Number(lostItem.category_id) === Number(foundItem.category_id)
     ) {
         score += 20;
     }
 
-
-    // --------------------------------------------------------
-    // ITEM NAME — 20%
-    // --------------------------------------------------------
-
+    // Item name: 20%
     score +=
         textSimilarity(
             lostItem.item_name,
             foundItem.item_name
         ) * 20;
 
-
-    // --------------------------------------------------------
-    // BRAND — 15%
-    // --------------------------------------------------------
-
-    if (
-        lostItem.brand &&
-        foundItem.brand
-    ) {
+    // Brand: 15%
+    if (lostItem.brand && foundItem.brand) {
         score +=
             textSimilarity(
                 lostItem.brand,
@@ -157,15 +122,8 @@ const calculateMatchScore = (lostItem, foundItem) => {
             ) * 15;
     }
 
-
-    // --------------------------------------------------------
-    // COLOUR — 10%
-    // --------------------------------------------------------
-
-    if (
-        lostItem.colour &&
-        foundItem.colour
-    ) {
+    // Colour: 10%
+    if (lostItem.colour && foundItem.colour) {
         score +=
             textSimilarity(
                 lostItem.colour,
@@ -173,22 +131,14 @@ const calculateMatchScore = (lostItem, foundItem) => {
             ) * 10;
     }
 
-
-    // --------------------------------------------------------
-    // DESCRIPTION — 15%
-    // --------------------------------------------------------
-
+    // Description: 15%
     score +=
         textSimilarity(
             lostItem.description,
             foundItem.description
         ) * 15;
 
-
-    // --------------------------------------------------------
-    // IDENTIFYING FEATURES — 10%
-    // --------------------------------------------------------
-
+    // Identifying features: 10%
     if (
         lostItem.identifying_features &&
         foundItem.identifying_features
@@ -200,44 +150,30 @@ const calculateMatchScore = (lostItem, foundItem) => {
             ) * 10;
     }
 
-
-    // --------------------------------------------------------
-    // LOCATION — 5%
-    // --------------------------------------------------------
-
+    // Location: 5%
     score +=
         textSimilarity(
             lostItem.location_lost,
             foundItem.location_found
         ) * 5;
 
-
-    // --------------------------------------------------------
-    // DATE — 5%
-    // --------------------------------------------------------
-
+    // Date: 5%
     score +=
         dateSimilarity(
             lostItem.date_lost,
             foundItem.date_found
         ) * 5;
 
-
-    return Number(
-        Math.min(score, 100).toFixed(2)
-    );
+    return Number(Math.min(score, 100).toFixed(2));
 };
-
 
 // ============================================================
 // GET LOST ITEM
 // ============================================================
 
 const getLostItemForMatching = async (lostItemId) => {
-
     const [rows] = await pool.execute(
-        `
-        SELECT
+        `SELECT
             id,
             user_id,
             category_id,
@@ -249,27 +185,21 @@ const getLostItemForMatching = async (lostItemId) => {
             location_lost,
             date_lost,
             status
-
-        FROM lost_items
-
-        WHERE id = ?
-        `,
+         FROM lost_items
+         WHERE id = ?`,
         [lostItemId]
     );
 
-    return rows[0];
+    return rows[0] || null;
 };
-
 
 // ============================================================
 // GET FOUND ITEM
 // ============================================================
 
 const getFoundItemForMatching = async (foundItemId) => {
-
     const [rows] = await pool.execute(
-        `
-        SELECT
+        `SELECT
             id,
             user_id,
             category_id,
@@ -281,189 +211,153 @@ const getFoundItemForMatching = async (foundItemId) => {
             location_found,
             date_found,
             status
-
-        FROM found_items
-
-        WHERE id = ?
-        `,
+         FROM found_items
+         WHERE id = ?`,
         [foundItemId]
     );
 
-    return rows[0];
+    return rows[0] || null;
 };
 
-
 // ============================================================
-// CREATE MATCH FOR TWO ITEMS
+// CREATE OR UPDATE A MATCH
 // ============================================================
 
 const matchLostAndFoundItems = async (
     lostItemId,
     foundItemId
 ) => {
-
     const lostItem =
         await getLostItemForMatching(lostItemId);
 
     const foundItem =
         await getFoundItemForMatching(foundItemId);
 
-
     if (!lostItem || !foundItem) {
         throw new Error("Lost item or found item not found");
     }
 
+    // A user should not match their own lost and found reports.
+    if (
+        Number(lostItem.user_id) ===
+        Number(foundItem.user_id)
+    ) {
+        return null;
+    }
 
-    const matchScore =
-        calculateMatchScore(
-            lostItem,
-            foundItem
-        );
+    // Do not match reports that are no longer eligible.
+    if (
+        !["lost", "matched"].includes(lostItem.status) ||
+        !["found", "matched"].includes(foundItem.status)
+    ) {
+        return null;
+    }
 
+    const matchScore = calculateMatchScore(
+        lostItem,
+        foundItem
+    );
 
-    // Only create a match if score is at least 40%
+    // Minimum match threshold: 40%.
     if (matchScore < 40) {
         return null;
     }
 
-
-    const [existingMatch] = await pool.execute(
-        `
-        SELECT id
-        FROM item_matches
-
-        WHERE lost_item_id = ?
-        AND found_item_id = ?
-        `,
-        [
-            lostItemId,
-            foundItemId
-        ]
-    );
-
-
-    if (existingMatch.length > 0) {
-
-        await pool.execute(
-            `
-            UPDATE item_matches
-
-            SET match_score = ?
-
-            WHERE lost_item_id = ?
-            AND found_item_id = ?
-            `,
-            [
-                matchScore,
-                lostItemId,
-                foundItemId
-            ]
-        );
-
-        return existingMatch[0].id;
-    }
-
-
-    const [result] = await pool.execute(
-        `
-        INSERT INTO item_matches
-        (
-            lost_item_id,
-            found_item_id,
-            match_score
-        )
-
-        VALUES (?, ?, ?)
-        `,
-        [
-            lostItemId,
-            foundItemId,
-            matchScore
-        ]
-    );
-
-
-    return result.insertId;
+    // Use the model to update an existing pair or create a new one.
+    return await matchModel.createOrUpdateMatch({
+        lost_item_id: lostItem.id,
+        found_item_id: foundItem.id,
+        match_score: matchScore
+    });
 };
 
-
 // ============================================================
-// FIND MATCHES FOR LOST ITEM
+// FIND AND SAVE MATCHES FOR A LOST ITEM
 // ============================================================
 
 const findMatchesForLostItem = async (lostItemId) => {
-
     const lostItem =
         await getLostItemForMatching(lostItemId);
-
 
     if (!lostItem) {
         throw new Error("Lost item not found");
     }
 
-
     const [foundItems] = await pool.execute(
-        `
-        SELECT
-            id,
-            user_id,
-            category_id,
-            item_name,
-            description,
-            brand,
-            colour,
-            identifying_features,
-            location_found,
-            date_found,
-            status
-
-        FROM found_items
-
-        WHERE status = 'found'
-        `
+        `SELECT id
+         FROM found_items
+         WHERE status IN ('found', 'matched')
+           AND user_id <> ?`,
+        [lostItem.user_id]
     );
-
 
     const matches = [];
 
-
     for (const foundItem of foundItems) {
+        const matchId = await matchLostAndFoundItems(
+            lostItemId,
+            foundItem.id
+        );
 
-        const matchScore =
-            calculateMatchScore(
-                lostItem,
-                foundItem
-            );
-
-
-        if (matchScore >= 40) {
-
+        if (matchId !== null) {
             matches.push({
-                lost_item_id: lostItem.id,
-                found_item_id: foundItem.id,
-                match_score: matchScore
+                match_id: matchId,
+                lost_item_id: Number(lostItemId),
+                found_item_id: foundItem.id
             });
         }
     }
 
+    return matches;
+};
 
-    // Highest scores first
-    matches.sort(
-        (a, b) =>
-            b.match_score - a.match_score
+// ============================================================
+// FIND AND SAVE MATCHES FOR A FOUND ITEM
+// ============================================================
+
+const findMatchesForFoundItem = async (foundItemId) => {
+    const foundItem =
+        await getFoundItemForMatching(foundItemId);
+
+    if (!foundItem) {
+        throw new Error("Found item not found");
+    }
+
+    const [lostItems] = await pool.execute(
+        `SELECT id
+         FROM lost_items
+         WHERE status IN ('lost', 'matched')
+           AND user_id <> ?`,
+        [foundItem.user_id]
     );
 
+    const matches = [];
+
+    for (const lostItem of lostItems) {
+        const matchId = await matchLostAndFoundItems(
+            lostItem.id,
+            foundItemId
+        );
+
+        if (matchId !== null) {
+            matches.push({
+                match_id: matchId,
+                lost_item_id: lostItem.id,
+                found_item_id: Number(foundItemId)
+            });
+        }
+    }
 
     return matches;
 };
 
-
 // ============================================================
-// EXPORT
+// EXPORT FUNCTIONS
 // ============================================================
 
 module.exports = {
     calculateMatchScore,
     matchLostAndFoundItems,
-    findMatchesForLostItem
+    findMatchesForLostItem,
+    findMatchesForFoundItem
 };
