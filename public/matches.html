@@ -221,16 +221,38 @@
       alert(`Match #${match.id}\nStatus: ${match.status}\nScore: ${match.score.toFixed(1)}%\n\nLost: ${match.lost.name}\nLocation: ${match.lost.location}\nDetails: ${match.lost.description}\n\nFound: ${match.found.name}\nLocation: ${match.found.location}\nDetails: ${match.found.description}`);
       return;
     }
-    const endpoint = action === "accept" ? `/matches/${encodeURIComponent(id)}/accept` : `/matches/${encodeURIComponent(id)}/reject`;
-    if (!confirm(`${action === "accept" ? "Accept" : "Reject"} match #${id}?`)) return;
-    btn.disabled = true;
-    try {
-      const data = await api(endpoint, { method:"PATCH" });
-      alert(data.message || `Match ${action}ed.`);
-      await load();
-    } catch (error) {
-      alert(error.message + "\nIf this action is not supported by the API, it will need to be connected to the backend route.");
-    } finally { btn.disabled = false; }
+   // Confirm the action before sending the request.
+if (!confirm(`${action === "accept" ? "Accept" : "Reject"} match #${id}?`)) {
+    return;
+}
+
+btn.disabled = true;
+
+try {
+    // The backend expects PATCH /api/matches/:id/status
+    const data = await api(`/matches/${encodeURIComponent(id)}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({
+            status: action === "accept" ? "accepted" : "rejected"
+        })
+    });
+
+    alert(data.message || `Match #${id} ${action}ed successfully.`);
+
+    // Reload matches so the displayed status reflects the database.
+    await load();
+
+} catch (error) {
+    console.error("Match action failed:", error);
+
+    alert(
+        `Could not ${action} match #${id}.\n\n` +
+        error.message
+    );
+
+} finally {
+    btn.disabled = false;
+}
   });
   [searchInput,statusFilter,sortSelect].forEach(el => el.addEventListener("input",render));
   document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => {
@@ -240,5 +262,7 @@
   load();
 })();
 </script>
+<script src="./js/ui.js"></script>
+<script src="./js/matches.js"></script>
 </body>
 </html>

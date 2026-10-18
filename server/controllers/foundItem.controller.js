@@ -1,5 +1,7 @@
 const { validationResult } = require("express-validator");
+
 const matchingService = require("../services/matching.service");
+
 const {
     createFoundItem,
     getAllFoundItems,
@@ -11,50 +13,131 @@ const {
 // ============================================================
 // REPORT FOUND ITEM
 // ============================================================
+
 const reportFoundItem = async (req, res) => {
-    const foundItemId = await createFoundItem({
-    user_id,
-    category_id,
-    item_name,
-    description,
-    brand,
-    colour,
-    identifying_features,
-    location_found,
-    date_found
-});
+    try {
+        // Check validation errors.
+        const errors = validationResult(req);
 
-const foundItem = await findFoundItemById(foundItemId);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                message: "Please correct the submitted information.",
+                errors: errors.array()
+            });
+        }
 
-try {
-    const matches =
-        await matchingService.findMatchesForFoundItem(foundItemId);
+        // Obtain the authenticated user's ID.
+        // Your authentication middleware should populate req.user.
+        const userId = req.user?.id;
 
-    console.log(
-        `Automatic matching completed for found item ${foundItemId}:`,
-        matches
-    );
-} catch (matchingError) {
-    console.error(
-        "Automatic matching for found item failed:",
-        matchingError
-    );
-}
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required. Please log in again."
+            });
+        }
 
-return res.status(201).json({
-    success: true,
-    message: "Found item reported successfully",
-    item: foundItem
-});
+        // Extract the submitted form data.
+        const {
+            category_id,
+            item_name,
+            description,
+            brand,
+            colour,
+            identifying_features,
+            location_found,
+            date_found
+        } = req.body;
+
+        // Validate required fields.
+        if (
+            !category_id ||
+            !item_name?.trim() ||
+            !description?.trim() ||
+            !location_found?.trim() ||
+            !date_found
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide all required found-item details."
+            });
+        }
+
+        // Create the found-item record.
+        const foundItemId = await createFoundItem({
+            user_id: userId,
+            category_id: Number(category_id),
+            item_name: item_name.trim(),
+            description: description.trim(),
+            brand: brand?.trim() || null,
+            colour: colour?.trim() || null,
+            identifying_features:
+                identifying_features?.trim() || null,
+            location_found: location_found.trim(),
+            date_found
+        });
+
+        // Retrieve the newly created item.
+        const foundItem = await findFoundItemById(foundItemId);
+
+        if (!foundItem) {
+            console.error(
+                "Found item was created but could not be retrieved:",
+                foundItemId
+            );
+
+            return res.status(500).json({
+                success: false,
+                message: "The item was submitted, but its details could not be retrieved."
+            });
+        }
+
+        // Automatically search for possible matches.
+        // Matching failure should not invalidate a successful report.
+        try {
+            const matches =
+                await matchingService.findMatchesForFoundItem(foundItemId);
+
+            console.log(
+                `Automatic matching completed for found item ${foundItemId}.`,
+                matches
+            );
+
+        } catch (matchingError) {
+            console.error(
+                "Automatic matching for found item failed:",
+                matchingError
+            );
+        }
+
+        // Return success.
+        return res.status(201).json({
+            success: true,
+            message: "Found item reported successfully.",
+            item: foundItem
+        });
+
+    } catch (error) {
+        console.error("Report found item error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Server error while reporting found item.",
+            ...(process.env.NODE_ENV !== "production" && {
+                error: error.message
+            })
+        });
+    }
 };
+
+
 // ============================================================
 // GET ALL FOUND ITEMS
 // ============================================================
 
 const getFoundItems = async (req, res) => {
-
     try {
-
         const {
             search,
             category_id,
@@ -81,12 +164,11 @@ const getFoundItems = async (req, res) => {
         });
 
     } catch (error) {
-
         console.error("Get found items error:", error);
 
         return res.status(500).json({
             success: false,
-            message: "Server error while retrieving found items"
+            message: "Server error while retrieving found items."
         });
     }
 };
@@ -97,9 +179,7 @@ const getFoundItems = async (req, res) => {
 // ============================================================
 
 const getFoundItem = async (req, res) => {
-
     try {
-
         const { id } = req.params;
 
         const item = await findFoundItemById(id);
@@ -107,7 +187,7 @@ const getFoundItem = async (req, res) => {
         if (!item) {
             return res.status(404).json({
                 success: false,
-                message: "Found item not found"
+                message: "Found item not found."
             });
         }
 
@@ -117,12 +197,11 @@ const getFoundItem = async (req, res) => {
         });
 
     } catch (error) {
-
         console.error("Get found item error:", error);
 
         return res.status(500).json({
             success: false,
-            message: "Server error while retrieving found item"
+            message: "Server error while retrieving found item."
         });
     }
 };
@@ -134,7 +213,14 @@ const getFoundItem = async (req, res) => {
 
 const getMyFoundItemsController = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required."
+            });
+        }
 
         const items = await getMyFoundItems(userId);
 
@@ -149,11 +235,15 @@ const getMyFoundItemsController = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Server error while retrieving your found items"
+            message: "Server error while retrieving your found items."
         });
     }
 };
 
+
+// ============================================================
+// EXPORT CONTROLLERS
+// ============================================================
 
 module.exports = {
     reportFoundItem,

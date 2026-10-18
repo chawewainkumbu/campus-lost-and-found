@@ -83,24 +83,34 @@ const notifyStaffAboutClaim = async (claim) => {
 
 // Notify claimant when claim status changes
 const notifyClaimStatus = async (claim, status) => {
+    let title;
     let message;
 
     if (status === "approved") {
-        message = "Your claim has been approved. Please follow the instructions to complete the item return.";
+        title = "Claim Approved";
+
+        message =
+            "Your claim has been approved. Visit UNZA Security to collect your item by providing proof of ownership.";
+
     } else if (status === "rejected") {
-        message = "Your claim has been rejected. Please contact the Lost & Found office if you need further information.";
+        title = "Claim Rejected";
+
+        message =
+            "Your claim has been rejected. Please contact the Lost & Found office if you need further information.";
+
     } else {
+        title = `Claim ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+
         message = `Your claim status has been updated to ${status}.`;
     }
 
     await notifyUser(
         claim.user_id,
-        `Claim ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+        title,
         message,
         "claim"
     );
 };
-
 
 // Notify claimant when the item has been returned
 const notifyItemReturned = async (claim) => {
